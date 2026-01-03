@@ -222,7 +222,7 @@ function FAQSection() {
         <section id="faq" className="py-16 bg-base-200">
             <div className="container mx-auto px-4">
                 <h2 className="text-3xl font-bold mb-8 text-center">Preguntas frecuentes</h2>
-                <div className="join join-vertical w-full max-w-3xl mx-auto">
+                <div className="w-full max-w-3xl mx-auto">
                     {faqs.map((f, i) => (
                         <div key={i} className="collapse collapse-arrow join-item border border-base-300 bg-base-100">
                             <input type="checkbox"/>
