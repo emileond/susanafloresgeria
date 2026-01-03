@@ -1,4 +1,13 @@
 import {createFileRoute} from '@tanstack/react-router'
+import {
+    ElderlyOutline,
+    BloodPressureMonitorOutline,
+    MentalHealthOutline,
+    RheumatologyOutline,
+    MedicinesOutline,
+    HospiceOutline
+} from 'healthicons-react';
+import DoctoraliaBooking from "../components/DoctoraliaBooking";
 
 export const Route = createFileRoute('/')({
     component: HomePage,
@@ -40,10 +49,7 @@ function HeroSection() {
                     </p>
                     <div className="flex flex-wrap gap-3">
                         <a href="#contacto" className="btn btn-primary">
-                            Reservar cita
-                        </a>
-                        <a href="tel:+521555555555" className="btn btn-outline">
-                            Llamar ahora
+                            Agendar cita
                         </a>
                         <a
                             href="https://wa.me/5215555555555"
@@ -99,31 +105,37 @@ function AboutSection() {
 function ServicesSection() {
     const services = [
         {
+            icon: <ElderlyOutline/>,
             title: 'Valoración geriátrica integral',
             desc:
                 'Evaluación completa del estado físico, cognitivo, emocional y social para un plan de cuidados personalizado.',
         },
         {
+            icon: <BloodPressureMonitorOutline/>,
             title: 'Control de enfermedades crónicas',
             desc:
                 'Manejo de diabetes, hipertensión, EPOC, insuficiencia cardíaca y otras condiciones frecuentes en el adulto mayor.',
         },
         {
+            icon: <MentalHealthOutline/>,
             title: 'Memoria y demencias',
             desc:
                 'Diagnóstico y abordaje de deterioro cognitivo, Alzheimer y otras demencias, con apoyo a familiares y cuidadores.',
         },
         {
+            icon: <RheumatologyOutline/>,
             title: 'Prevención de caídas y fragilidad',
             desc:
                 'Detección de riesgos, ejercicios terapéuticos y recomendaciones para mantener la movilidad y la independencia.',
         },
         {
+            icon: <MedicinesOutline/>,
             title: 'Revisión de medicamentos (polifarmacia)',
             desc:
                 'Optimización de tratamientos para evitar interacciones, efectos adversos y simplificar esquemas complejos.',
         },
         {
+            icon: <HospiceOutline/>,
             title: 'Cuidados paliativos y soporte familiar',
             desc:
                 'Acompañamiento centrado en confort, dignidad y control de síntomas, con orientación a la familia.',
@@ -138,13 +150,13 @@ function ServicesSection() {
                     {services.map((s) => (
                         <div key={s.title} className="card bg-base-100 shadow">
                             <div className="card-body">
-                                <h3 className="card-title">{s.title}</h3>
-                                <p className="text-base-content/80">{s.desc}</p>
-                                <div className="card-actions justify-end">
-                                    <a href="#contacto" className="btn btn-primary btn-sm">
-                                        Reservar
-                                    </a>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-3xl text-secondary">
+                                        {s.icon}
+                                    </span>
+                                    <h3 className="card-title">{s.title}</h3>
                                 </div>
+                                <p className="text-base-content/80">{s.desc}</p>
                             </div>
                         </div>
                     ))}
@@ -245,30 +257,7 @@ function ContactSection() {
                            rel="noreferrer">WhatsApp</a>
                     </div>
                 </div>
-                <form className="card bg-base-100 shadow">
-                    <div className="card-body gap-4">
-                        <div className="form-control">
-                            <label className="label"><span className="label-text">Nombre completo</span></label>
-                            <input type="text" className="input input-bordered" placeholder="Tu nombre" required/>
-                        </div>
-                        <div className="form-control">
-                            <label className="label"><span className="label-text">Teléfono</span></label>
-                            <input type="tel" className="input input-bordered" placeholder="Ej. 55 1234 5678" required/>
-                        </div>
-                        <div className="form-control">
-                            <label className="label"><span className="label-text">Correo electrónico</span></label>
-                            <input type="email" className="input input-bordered" placeholder="tucorreo@ejemplo.com"/>
-                        </div>
-                        <div className="form-control">
-                            <label className="label"><span className="label-text">Motivo de la consulta</span></label>
-                            <textarea className="textarea textarea-bordered"
-                                      placeholder="Cuéntame brevemente"></textarea>
-                        </div>
-                        <div className="card-actions justify-end">
-                            <button type="submit" className="btn btn-primary">Enviar solicitud</button>
-                        </div>
-                    </div>
-                </form>
+                <DoctoraliaBooking/>
             </div>
         </section>
     )
