@@ -8,6 +8,9 @@ import {
     HospiceOutline
 } from 'healthicons-react';
 import DoctoraliaBooking from "../components/DoctoraliaBooking";
+import CTAButton from "../components/CTAButton";
+import {TbBrandWhatsapp} from "react-icons/tb";
+
 
 export const Route = createFileRoute('/')({
     component: HomePage,
@@ -31,9 +34,10 @@ function HeroSection() {
         <section className="hero bg-base-200">
             <div className="hero-content flex-col lg:flex-row-reverse gap-12 py-12">
                 <img
-                    src="/doctor-hero.jpg"
+                    src="/headshot.png"
                     alt="Dra. Susana Flores - Geriatra"
-                    className="max-w-sm rounded-lg shadow-2xl"
+                    loading="eager"
+                    className="max-w-sm mask mask-squircle shadow-2xl"
                     onError={(e) => {
                         // Hide image if not available yet
                         ;(e.target as HTMLImageElement).style.display = 'none'
@@ -48,15 +52,17 @@ function HeroSection() {
                         personas mayores y a sus familias con un enfoque integral para mejorar su calidad de vida.
                     </p>
                     <div className="flex flex-wrap gap-3">
-                        <a href="#contacto" className="btn btn-primary">
-                            Agendar cita
-                        </a>
+                        <CTAButton/>
                         <a
                             href="https://wa.me/5215555555555"
                             target="_blank"
                             rel="noreferrer"
-                            className="btn btn-outline"
+                            className="btn btn-soft"
                         >
+                            <span className="text-xl">
+
+                            <TbBrandWhatsapp/>
+                            </span>
                             WhatsApp
                         </a>
                     </div>

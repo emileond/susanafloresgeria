@@ -1,5 +1,6 @@
 import {Link, Outlet} from '@tanstack/react-router'
 import {createRootRoute} from '@tanstack/react-router'
+import CTAButton from "../components/CTAButton";
 
 export const Route = createRootRoute({
     component: RootComponent,
@@ -29,16 +30,16 @@ function Navbar() {
             </div>
             <div className="navbar-center hidden lg:flex">
                 <ul className="menu menu-horizontal px-1">
-                    <li><a href="#inicio">Inicio</a></li>
-                    <li><a href="#servicios">Servicios</a></li>
-                    <li><a href="#testimonios">Testimonios</a></li>
-                    <li><a href="#faq">Preguntas</a></li>
+                    <li><Link to="/" hash="inicio">Inicio</Link></li>
+                    <li><Link to="/" hash="servicios">Servicios</Link></li>
+                    <li><Link to="/" hash="testimonios">Testimonios</Link></li>
+                    <li><Link to="/" hash="faq">Preguntas</Link></li>
                     <li><Link to="/blog">Blog</Link></li>
-                    <li><a href="#contacto">Contacto</a></li>
+                    <li><Link to="/" hash="contacto">Contacto</Link></li>
                 </ul>
             </div>
             <div className="navbar-end gap-2">
-                <a href="#contacto" className="btn btn-primary">Agendar cita</a>
+                <CTAButton/>
             </div>
         </div>
     )
@@ -49,10 +50,10 @@ function SiteFooter() {
         <footer className="footer bg-base-200 text-base-content p-10">
             <nav>
                 <h6 className="footer-title">Consultorio Geriátrico</h6>
-                <a className="link link-hover" href="#inicio">Inicio</a>
-                <a className="link link-hover" href="#servicios">Servicios</a>
+                <Link className="link link-hover" to="/" hash="inicio">Inicio</Link>
+                <Link className="link link-hover" to="/" hash="servicios">Servicios</Link>
                 <Link className="link link-hover" to="/blog">Blog</Link>
-                <a className="link link-hover" href="#contacto">Contacto</a>
+                <Link className="link link-hover" to="/" hash="contacto">Contacto</Link>
             </nav>
             <nav>
                 <h6 className="footer-title">Contacto</h6>
