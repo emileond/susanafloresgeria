@@ -6,3 +6,5 @@ DEV_USER_EMAIL=doctora@example.com
 ANTHROPIC_API_KEY=
 # Opcional: dirección iCal privada del calendario con las citas de Doctoralia (vacío = sin sincronizar)
 DOCTORALIA_ICS_URL=
+# Solo producción (secreto): correo que se da de alta como administradora en su primer acceso
+BOOTSTRAP_ADMIN_EMAIL=

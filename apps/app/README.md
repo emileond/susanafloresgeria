@@ -40,15 +40,16 @@ Pruebas y tipos: `npm test -w @susanafloresgeria/app` · `npm run check -w @susa
 2. **Worker y dominio:** en Cloudflare, *Workers & Pages → Create → Import a repository*, con:
    - **Nombre:** `susanafloresgeria-app`
    - **Build command:** `npm run build:app`
-   - **Deploy command:** `npx wrangler deploy -c apps/app/wrangler.jsonc`
+   - **Deploy command:** `npm run deploy -w @susanafloresgeria/app` (no use `wrangler deploy -c …`: se saltaría la compilación de Vite y fallaría por falta de `assets.directory`)
    - **Build watch paths:** `apps/app/*` y `packages/theme/*`
+   - **Ramas:** solo `main` (desactive las compilaciones de otras ramas: una vista previa no tendría base de datos)
 
    Después agregue el dominio personalizado `app.susanafloresgeria.com`.
 3. **Cloudflare Access (Zero Trust):** cree una aplicación *Self-hosted* para `app.susanafloresgeria.com`, con Google como proveedor de identidad y una política que permita solo el correo de la doctora. Duración de sesión recomendada: 8–12 h.
 4. **Variables** en `wrangler.jsonc` (o en el panel del Worker):
    - `ACCESS_TEAM_DOMAIN`: p. ej. `susanaflores.cloudflareaccess.com`
    - `ACCESS_AUD`: el *Application Audience (AUD) Tag* de la aplicación de Access
-   - `BOOTSTRAP_ADMIN_EMAIL`: el correo de la doctora (se da de alta sola en su primer acceso)
+   - `BOOTSTRAP_ADMIN_EMAIL` (secreto, porque el repositorio es público): el correo de la doctora, que se da de alta sola en su primer acceso: `npx wrangler secret put BOOTSTRAP_ADMIN_EMAIL`
 
 ## Escalas geriátricas
 
