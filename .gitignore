@@ -26,3 +26,7 @@ dist-ssr
 # Astro
 .astro/
 .tanstack/
+
+# Cloudflare local
+.dev.vars
+.wrangler/

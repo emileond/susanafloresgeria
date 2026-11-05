@@ -13,5 +13,8 @@
   },
   "observability": {
     "enabled": true
-  }
+  },
+  // Vistas previas de ramas (PRs) con `wrangler preview`. Vacío: el sitio solo usa
+  // archivos estáticos, así que no necesita variables ni enlaces propios.
+  "previews": {}
 }
