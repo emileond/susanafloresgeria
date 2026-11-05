@@ -1,0 +1,62 @@
+# Expedientes — app clínica privada
+
+App para que la Dra. Flores (y en el futuro su equipo) lleve el expediente de sus pacientes: alta rápida, ficha de identificación, cuidadores, notas clínicas (SOAP) con firma, historia clínica versionada, archivos (estudios, fotos, recetas) y lista de medicamentos.
+
+**Stack (solo Cloudflare):** Vite + React 19 + TanStack Router/Query (interfaz) · Hono en Workers (API) · D1 + Drizzle (datos) · R2 (archivos) · Cloudflare Access (inicio de sesión con Google).
+
+```
+src/client/   interfaz React (rutas en src/client/routes)
+src/worker/   API Hono (/api/*), esquema D1, autenticación y auditoría
+src/shared/   esquemas zod, catálogos y tipos usados por ambos lados
+drizzle/      migraciones SQL (se aplican con wrangler)
+seed/         datos ficticios para desarrollo local
+test/         pruebas de la API dentro del runtime de Workers
+```
+
+## Desarrollo local
+
+```bash
+npm install                      # desde la raíz del repositorio
+cp apps/app/.dev.vars.example apps/app/.dev.vars
+npm run db:migrate:local -w @susanafloresgeria/app
+npm run db:seed:local -w @susanafloresgeria/app   # pacientes ficticios
+npm run dev:app                  # http://localhost:5173
+```
+
+En local no hay Cloudflare Access: se entra como `DEV_USER_EMAIL` (de `.dev.vars`). Esa excepción solo funciona con `ENVIRONMENT=development` **y** en `localhost`.
+
+Pruebas y tipos: `npm test -w @susanafloresgeria/app` · `npm run check -w @susanafloresgeria/app`.
+
+## Primer despliegue (una sola vez)
+
+1. **Base de datos y archivos**
+   ```bash
+   cd apps/app
+   npx wrangler d1 create susanafloresgeria-app        # copie el database_id a wrangler.jsonc
+   npx wrangler r2 bucket create susanafloresgeria-files
+   npx wrangler r2 bucket create susanafloresgeria-backups
+   npx wrangler d1 migrations apply DB --remote
+   ```
+2. **Worker y dominio:** en Cloudflare, *Workers & Pages → Create → Import a repository*, con:
+   - **Nombre:** `susanafloresgeria-app`
+   - **Build command:** `npm run build:app`
+   - **Deploy command:** `npx wrangler deploy -c apps/app/wrangler.jsonc`
+   - **Build watch paths:** `apps/app/*` y `packages/theme/*`
+
+   Después agregue el dominio personalizado `app.susanafloresgeria.com`.
+3. **Cloudflare Access (Zero Trust):** cree una aplicación *Self-hosted* para `app.susanafloresgeria.com`, con Google como proveedor de identidad y una política que permita solo el correo de la doctora. Duración de sesión recomendada: 8–12 h.
+4. **Variables** en `wrangler.jsonc` (o en el panel del Worker):
+   - `ACCESS_TEAM_DOMAIN`: p. ej. `susanaflores.cloudflareaccess.com`
+   - `ACCESS_AUD`: el *Application Audience (AUD) Tag* de la aplicación de Access
+   - `BOOTSTRAP_ADMIN_EMAIL`: el correo de la doctora (se da de alta sola en su primer acceso)
+
+## Buenas prácticas incluidas
+
+- **Doble verificación de sesión:** Access protege el dominio y la API además verifica la firma del JWT en cada petición. Los roles se aplican en el servidor: `doctor`/`admin` ven lo clínico; `assistant` solo datos de identificación.
+- **Notas firmadas inmutables:** se bloquean en la API y con un *trigger* en la base de datos; las correcciones se hacen con **adenda**. Los borradores se pueden descartar.
+- **Historia clínica versionada:** cada guardado crea una versión nueva; las anteriores no se modifican.
+- **Nada se borra del expediente:** pacientes y archivos se **archivan** (NOM-004: conservar al menos 5 años).
+- **Bitácora de auditoría** (NOM-024): quién consultó o cambió qué y cuándo; solo admite inserciones y nunca guarda contenido clínico.
+- **Archivos privados en R2:** sin URL pública, entregados solo por la API con `no-store`; lista blanca de tipos y máximo 50 MB; se guarda el hash SHA-256.
+- **Sin datos de pacientes en URLs ni en registros:** la búsqueda va en el cuerpo de la petición y los errores se registran sin contenido.
+- **Bloqueo por inactividad:** a los 15 min la pantalla se oculta.

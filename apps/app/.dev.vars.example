@@ -1,0 +1,6 @@
+# Copie este archivo como .dev.vars para desarrollo local (no se sube al repositorio).
+ENVIRONMENT=development
+# En local no hay Cloudflare Access: se usa este usuario de prueba.
+DEV_USER_EMAIL=doctora@example.com
+# Opcional (PR B): clave de Anthropic para probar el llenado con IA
+# ANTHROPIC_API_KEY=

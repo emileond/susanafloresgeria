@@ -1,0 +1,46 @@
+@import "tailwindcss";
+@import "@susanafloresgeria/theme";
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-white font-sans text-[15px] leading-normal text-ink antialiased sm:text-base;
+  }
+  h1, h2, h3 {
+    @apply font-display font-bold text-ink;
+    letter-spacing: -0.01em;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+  /* Evita que iOS haga zoom al enfocar campos */
+  input, select, textarea {
+    font-size: 16px;
+  }
+  @media (min-width: 640px) {
+    input, select, textarea {
+      font-size: inherit;
+    }
+  }
+}
+
+@layer components {
+  .field-label {
+    @apply mb-1.5 block text-sm font-semibold text-ink/80;
+  }
+  .field-control {
+    @apply block w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-ink placeholder:text-muted/70 transition-colors hover:border-ink/25 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 focus:outline-none disabled:bg-mist disabled:text-muted;
+  }
+  .field-error {
+    @apply mt-1 text-sm font-medium text-red-700;
+  }
+  .card {
+    @apply rounded-2xl border border-line bg-white;
+  }
+  .section-heading {
+    @apply text-lg font-bold;
+  }
+}

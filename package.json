@@ -13,7 +13,11 @@
     "build": "npm run build --workspaces --if-present",
     "build:web": "npm run build -w @susanafloresgeria/web",
     "check": "npm run check --workspaces --if-present",
-    "deploy:web": "npm run build:web && npm run deploy -w @susanafloresgeria/web"
+    "deploy:web": "npm run build:web && npm run deploy -w @susanafloresgeria/web",
+    "dev:app": "npm run dev -w @susanafloresgeria/app",
+    "build:app": "npm run build -w @susanafloresgeria/app",
+    "deploy:app": "npm run build:app && npm run deploy -w @susanafloresgeria/app",
+    "test": "npm run test --workspaces --if-present"
   },
   "engines": {
     "node": ">=22"
