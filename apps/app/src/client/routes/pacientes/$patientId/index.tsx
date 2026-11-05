@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { ChevronRight, ClipboardList, FileText, Phone, Pill, ScrollText, UserRound } from 'lucide-react';
+import { CalendarDays, ChevronRight, ClipboardList, FileText, Phone, Pill, ScrollText, UserRound } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { NOTE_TYPE_LABELS } from '../../../../shared/constants';
 import { formatDate } from '../../../../shared/format';
@@ -7,7 +7,9 @@ import { SCALES_BY_KEY } from '../../../../shared/scales';
 import { Badge } from '../../../components/ui/misc';
 import { ScoreGauge } from '../../../components/scales/ScoreGauge';
 import { SEVERITY_STYLE } from '../../../features/scaleUi';
-import { useAssessments, useMe, useMedications, useNotes, usePatient } from '../../../lib/queries';
+import { useAssessments, useMe, useMedications, useNotes, usePatient, usePatientAppointments } from '../../../lib/queries';
+import { hhmm, zonedParts } from '../../../../shared/time';
+import { MODALITY_LABELS } from '../../../../shared/constants';
 
 export const Route = createFileRoute('/pacientes/$patientId/')({ component: Summary });
 
@@ -40,6 +42,10 @@ function Summary() {
   const meds = useMedications(clinical ? patientId : '');
   const notes = useNotes(clinical ? patientId : '');
   const assessments = useAssessments(clinical ? patientId : '');
+  const appts = usePatientAppointments(patientId);
+  const upcoming = (appts.data ?? [])
+    .filter((a) => Date.parse(a.endsAt) >= Date.now() && a.status !== 'cancelled')
+    .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
   if (!p) return null;
 
   const activeMeds = (meds.data ?? []).filter((m) => m.active);
@@ -66,6 +72,39 @@ function Summary() {
           </div>
         ) : (
           <p className="text-muted">Sin familiar o cuidador registrado.</p>
+        )}
+      </Card>
+
+      <Card
+        title="Próximas citas"
+        icon={<CalendarDays />}
+        action={
+          <Link to="/agenda" search={{ nuevo: patientId }} className="inline-flex items-center gap-0.5 text-sm font-semibold text-brand-700 hover:underline">
+            Agendar <ChevronRight className="size-4" aria-hidden />
+          </Link>
+        }
+      >
+        {upcoming.length ? (
+          <ul className="grid gap-2">
+            {upcoming.slice(0, 3).map((a) => {
+              const st = zonedParts(a.startsAt);
+              return (
+                <li key={a.id} className="flex items-center gap-3">
+                  <span className={`h-8 w-1 rounded-full ${a.source === 'doctoralia' ? 'bg-teal-500' : 'bg-brand-600'}`} aria-hidden />
+                  <span>
+                    <span className="block font-semibold">
+                      {formatDate(a.startsAt, { weekday: 'short', day: 'numeric', month: 'short' })} · {hhmm(st.hour, st.minute)}
+                    </span>
+                    <span className="block text-sm text-muted">
+                      {MODALITY_LABELS[a.modality]} · {a.source === 'doctoralia' ? 'Doctoralia' : 'Agendada aquí'}
+                    </span>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="text-muted">Sin citas próximas.</p>
         )}
       </Card>
 

@@ -3,7 +3,7 @@ import { auditLog } from '../db/schema';
 import type { AppEnv } from '../types';
 import { newId } from './ids';
 
-export type AuditAction = 'view' | 'create' | 'update' | 'sign' | 'archive' | 'unarchive' | 'delete' | 'download' | 'upload';
+export type AuditAction = 'view' | 'create' | 'update' | 'sign' | 'issue' | 'cancel' | 'print' | 'archive' | 'unarchive' | 'delete' | 'download' | 'upload';
 
 /**
  * Registra un acceso o cambio en la bitácora (NOM-024). Solo metadatos: nunca contenido clínico.

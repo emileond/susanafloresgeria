@@ -4,3 +4,5 @@ ENVIRONMENT=development
 DEV_USER_EMAIL=doctora@example.com
 # Opcional: clave de Anthropic para probar el llenado de historia clínica con IA (vacío = desactivado)
 ANTHROPIC_API_KEY=
+# Opcional: dirección iCal privada del calendario con las citas de Doctoralia (vacío = sin sincronizar)
+DOCTORALIA_ICS_URL=

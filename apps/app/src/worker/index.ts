@@ -1,9 +1,17 @@
-import { and, count, desc, eq, isNull } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gte, isNull, lt } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/d1';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { secureHeaders } from 'hono/secure-headers';
 import type { ApiErrorBody, Dashboard, Me } from '../shared/types';
-import { notes, patients } from './db/schema';
+import * as schema from './db/schema';
+import { appointments, notes, patients } from './db/schema';
+import { syncDoctoralia } from './calendar/sync';
+import { zonedTimeToUtc } from '../shared/time';
+import { backupDatabase } from './jobs/backup';
+import { appointmentRoutes, selectAppointments, toAppointmentItem } from './routes/appointments';
+import { TIME_ZONE } from '../shared/constants';
+import { todayISO } from '../shared/format';
 import { authMiddleware, canEditClinical } from './lib/auth';
 import { dbMiddleware } from './lib/db';
 import { fileRoutes, patientFileRoutes } from './routes/files';
@@ -11,6 +19,7 @@ import { historyRoutes } from './routes/history';
 import { medicationRoutes, patientMedicationRoutes } from './routes/medications';
 import { noteRoutes, patientNoteRoutes } from './routes/notes';
 import { patientRoutes, toListItem } from './routes/patients';
+import { patientPrescriptionRoutes, prescriptionRoutes } from './routes/prescriptions';
 import { assessmentRoutes, patientAssessmentRoutes } from './routes/assessments';
 import { enabledScales } from '../shared/scales';
 import type { AppEnv } from './types';
@@ -44,7 +53,10 @@ const api = new Hono<AppEnv>()
   .get('/dashboard', async (c) => {
     const db = c.get('db');
     const clinical = canEditClinical(c.get('user').role);
-    const [patientTotal, recent, drafts] = await Promise.all([
+    const [y, m, d] = todayISO().split('-').map(Number) as [number, number, number];
+    const dayStart = zonedTimeToUtc(y, m, d, 0, 0, 0, TIME_ZONE);
+    const dayEnd = new Date(dayStart.getTime() + 24 * 3600_000);
+    const [patientTotal, recent, drafts, today] = await Promise.all([
       db.select({ n: count() }).from(patients).where(isNull(patients.archivedAt)),
       db.select().from(patients).where(isNull(patients.archivedAt)).orderBy(desc(patients.updatedAt)).limit(8),
       clinical
@@ -56,9 +68,13 @@ const api = new Hono<AppEnv>()
             .orderBy(desc(notes.updatedAt))
             .limit(10)
         : Promise.resolve([]),
+      selectAppointments(db)
+        .where(and(gte(appointments.startsAt, dayStart), lt(appointments.startsAt, dayEnd)))
+        .orderBy(asc(appointments.startsAt)),
     ]);
     const body: Dashboard = {
       totals: { patients: patientTotal[0]?.n ?? 0, draftNotes: drafts.length },
+      todayAppointments: today.map((r) => toAppointmentItem(r.a, r.patientName)),
       recentPatients: recent.map(toListItem),
       draftNotes: drafts,
     };
@@ -72,10 +88,13 @@ const api = new Hono<AppEnv>()
   .route('/patients/:patientId/files', patientFileRoutes)
   .route('/patients/:patientId/medications', patientMedicationRoutes)
   .route('/patients/:patientId/assessments', patientAssessmentRoutes)
+  .route('/patients/:patientId/prescriptions', patientPrescriptionRoutes)
   .route('/assessments', assessmentRoutes)
+  .route('/appointments', appointmentRoutes)
   .route('/notes', noteRoutes)
   .route('/files', fileRoutes)
-  .route('/medications', medicationRoutes);
+  .route('/medications', medicationRoutes)
+  .route('/prescriptions', prescriptionRoutes);
 
 const app = new Hono<AppEnv>()
   .route('/api', api)
@@ -88,4 +107,24 @@ app.onError((err, c) => {
   return c.json({ error: { code: 'server_error', message: 'Ocurrió un error inesperado. Intente de nuevo.' } } satisfies ApiErrorBody, 500);
 });
 
-export default app satisfies ExportedHandler<Env>;
+export default {
+  fetch: app.fetch,
+  /** Tareas programadas (ver "triggers" en wrangler.jsonc). */
+  async scheduled(controller, env, ctx) {
+    if (controller.cron === '0 9 * * *') {
+      ctx.waitUntil(
+        backupDatabase(env).then(
+          (r) => console.log('backup_ok', Object.keys(r.tables).length),
+          (err) => console.error('backup_failed', err instanceof Error ? err.name : 'unknown'),
+        ),
+      );
+    } else {
+      ctx.waitUntil(
+        syncDoctoralia(env, drizzle(env.DB, { schema })).then(
+          (r) => console.log('doctoralia_sync', r.status, r.added, r.updated, r.cancelled),
+          (err) => console.error('doctoralia_sync_failed', err instanceof Error ? err.name : 'unknown'),
+        ),
+      );
+    }
+  },
+} satisfies ExportedHandler<Env>;

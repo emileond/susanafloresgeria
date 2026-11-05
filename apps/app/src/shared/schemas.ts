@@ -128,6 +128,85 @@ export const assessmentInput = z.object({
 });
 export type AssessmentInput = z.input<typeof assessmentInput>;
 
+/** Un medicamento de la receta. En borrador todo es opcional; al emitir se exigen los campos del art. 30. */
+export const prescriptionItemInput = z.object({
+  drug: trimmed(160),
+  brand: optionalText(120),
+  presentation: optionalText(160),
+  dose: optionalText(120),
+  route: optionalText(60),
+  frequency: optionalText(120),
+  duration: optionalText(120),
+  quantity: optionalText(120),
+  instructions: optionalText(600),
+  medicationId: z.uuid().optional(),
+});
+export type PrescriptionItemInput = z.input<typeof prescriptionItemInput>;
+
+const prescriptionFields = {
+  date: isoDate,
+  noteId: z.uuid().nullable().optional(),
+  items: z.array(prescriptionItemInput).max(20, 'Máximo 20 medicamentos por receta'),
+  diagnosis: optionalText(500),
+  generalInstructions: optionalText(4000),
+  weightKg: z.number().finite().positive().max(400).nullable().optional(),
+};
+
+export const prescriptionCreateInput = z.object({
+  ...prescriptionFields,
+  date: isoDate.optional(),
+  items: prescriptionFields.items.optional(),
+  /** Prellenar con estos medicamentos de la lista del paciente. */
+  fromMedicationIds: z.array(z.uuid()).max(20).optional(),
+});
+export type PrescriptionCreateInput = z.input<typeof prescriptionCreateInput>;
+
+export const prescriptionUpdateInput = z.object(prescriptionFields).partial();
+export type PrescriptionUpdateInput = z.input<typeof prescriptionUpdateInput>;
+
+export const prescriptionIssueInput = z.object({
+  /** Agregar a la lista de medicamentos del paciente los que aún no estén activos. */
+  addToMedications: z.boolean().default(false),
+});
+
+export const prescriptionCancelInput = z.object({
+  reason: trimmed(500).min(5, 'Escriba el motivo de la cancelación'),
+});
+
 export const aiHistoryDraftInput = z.object({
   noteIds: z.array(z.uuid()).min(1, 'Seleccione al menos una nota').max(30),
 });
+
+const isoDateTime = z.iso.datetime({ offset: true });
+export const APPOINTMENT_STATUSES = ['scheduled', 'done', 'cancelled', 'no_show'] as const;
+
+/** Cita directa (agendada en la app). */
+export const appointmentInput = z
+  .object({
+    patientId: z.uuid().nullable().optional(),
+    title: optionalText(160),
+    startsAt: isoDateTime,
+    endsAt: isoDateTime,
+    modality: z.enum(MODALITIES).default('consultorio'),
+    status: z.enum(APPOINTMENT_STATUSES).default('scheduled'),
+    notes: optionalText(1000),
+  })
+  .refine((v) => Date.parse(v.endsAt) > Date.parse(v.startsAt), { message: 'La hora de fin debe ser posterior al inicio', path: ['endsAt'] })
+  .refine((v) => Date.parse(v.endsAt) - Date.parse(v.startsAt) <= 12 * 3600_000, { message: 'La cita no puede durar más de 12 horas', path: ['endsAt'] })
+  .refine((v) => Boolean(v.patientId) || Boolean(v.title), { message: 'Elija un paciente o escriba un título', path: ['title'] });
+export type AppointmentInput = z.input<typeof appointmentInput>;
+
+export const appointmentUpdateInput = z.object({
+  patientId: z.uuid().nullable().optional(),
+  title: optionalText(160),
+  startsAt: isoDateTime.optional(),
+  endsAt: isoDateTime.optional(),
+  modality: z.enum(MODALITIES).optional(),
+  status: z.enum(APPOINTMENT_STATUSES).optional(),
+  notes: optionalText(1000),
+});
+export type AppointmentUpdateInput = z.input<typeof appointmentUpdateInput>;
+
+export const appointmentRangeQuery = z
+  .object({ from: isoDateTime, to: isoDateTime })
+  .refine((v) => Date.parse(v.to) > Date.parse(v.from) && Date.parse(v.to) - Date.parse(v.from) <= 92 * 24 * 3600_000, 'Rango inválido');

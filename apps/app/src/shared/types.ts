@@ -45,6 +45,8 @@ export interface PatientDetail extends PatientListItem {
     draftNotes: number;
     filesCount: number;
     assessmentsCount: number;
+    /** Recetas emitidas vigentes (no cuenta borradores ni canceladas). */
+    prescriptionsCount: number;
     historyVersion: number | null;
     lastNote: { id: string; visitDate: string; type: NoteType } | null;
   };
@@ -115,6 +117,7 @@ export interface MedicationItem {
 
 export interface Dashboard {
   totals: { patients: number; draftNotes: number };
+  todayAppointments: AppointmentItem[];
   recentPatients: PatientListItem[];
   draftNotes: { id: string; patientId: string; patientName: string; visitDate: string; type: NoteType }[];
 }
@@ -142,9 +145,81 @@ export interface AssessmentItem {
   createdByName: string | null;
 }
 
+export interface PrescriptionItem {
+  drug: string;
+  brand?: string;
+  presentation?: string;
+  dose?: string;
+  route?: string;
+  frequency?: string;
+  duration?: string;
+  quantity?: string;
+  instructions?: string;
+  medicationId?: string;
+}
+
+/** Datos del paciente y de quien prescribe tal como quedaron impresos al emitir la receta. */
+export interface PrescriptionSnapshot {
+  patient: { fullName: string; birthDate: string; age: number; sex: 'F' | 'M' | 'X'; allergies: string | null };
+  prescriber: {
+    name: string;
+    specialty: string;
+    degrees: { title: string; school: string; cedulaLabel: string; cedula: string }[];
+    address: string[];
+  };
+}
+
+export type PrescriptionStatus = 'draft' | 'issued' | 'cancelled';
+
+export interface Prescription {
+  id: string;
+  patientId: string;
+  noteId: string | null;
+  folio: number | null;
+  date: string;
+  items: PrescriptionItem[];
+  diagnosis: string | null;
+  generalInstructions: string | null;
+  weightKg: number | null;
+  status: PrescriptionStatus;
+  /** Datos impresos tal como quedaron al emitir (null en borradores). */
+  snapshot: PrescriptionSnapshot | null;
+  issuedAt: string | null;
+  issuedByName: string | null;
+  cancelledAt: string | null;
+  cancelledByName: string | null;
+  cancelReason: string | null;
+  sourceId: string | null;
+  sourceFolio: number | null;
+  createdAt: string;
+  updatedAt: string;
+  createdByName: string | null;
+}
+
 export interface AiHistoryDraft {
   /** Propuesta por sección (solo las secciones con información nueva o integrada). */
   proposals: Partial<Record<string, string>>;
   notesUsed: number;
   model: string;
+}
+
+export type AppointmentStatus = 'scheduled' | 'done' | 'cancelled' | 'no_show';
+
+export interface AppointmentItem {
+  id: string;
+  source: 'direct' | 'doctoralia';
+  patientId: string | null;
+  patientName: string | null;
+  title: string | null;
+  startsAt: string;
+  endsAt: string;
+  modality: 'consultorio' | 'domicilio' | 'en_linea';
+  status: AppointmentStatus;
+  notes: string | null;
+  externalUrl: string | null;
+}
+
+export interface SyncStatus {
+  configured: boolean;
+  lastRun: { status: 'ok' | 'error'; finishedAt: string | null; added: number; updated: number; cancelled: number; message: string | null } | null;
 }

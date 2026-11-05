@@ -69,7 +69,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <UiContext.Provider value={actions}>
       <div className="min-h-dvh lg:flex">
         {/* Barra lateral (escritorio) */}
-        <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-line bg-mist/60 px-4 py-5 lg:flex">
+        <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-line bg-mist/60 px-4 py-5 lg:flex print:hidden">
           <Link to="/" className="flex items-center gap-2.5 px-2">
             <img src="/logo-mark.svg" alt="" className="size-9" />
             <span className="leading-tight">
@@ -119,7 +119,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </aside>
 
         {/* Barra superior (móvil) */}
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-line bg-white/90 px-4 backdrop-blur lg:hidden">
+        <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-line bg-white/90 px-4 backdrop-blur lg:hidden print:hidden">
           <Link to="/" className="flex items-center gap-2">
             <img src="/logo-mark.svg" alt="" className="size-8" />
             <span className="font-bold">Expedientes</span>
@@ -129,10 +129,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           </button>
         </header>
 
-        <main className="min-w-0 flex-1 pb-24 lg:pb-0">{children}</main>
+        <main className="min-w-0 flex-1 pb-24 lg:pb-0 print:pb-0">{children}</main>
 
         {/* Navegación inferior (móvil) */}
-        <nav aria-label="Principal" className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-line bg-white pb-[env(safe-area-inset-bottom)] lg:hidden">
+        <nav aria-label="Principal" className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-line bg-white pb-[env(safe-area-inset-bottom)] lg:hidden print:hidden">
           {nav.slice(0, 2).map((item) => (
             <Link key={item.to} to={item.to} className={cn('flex flex-col items-center gap-0.5 py-2 text-xs font-semibold text-muted', isActive(item.to, item.exact) && 'text-brand-700')}>
               <item.icon className="size-5.5" aria-hidden />

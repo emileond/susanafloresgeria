@@ -35,7 +35,14 @@
     // Asistente de IA (historia clínica). La clave va como secreto: `wrangler secret put ANTHROPIC_API_KEY`.
     "AI_MODEL": "claude-haiku-5-5",
     // URL de Cloudflare AI Gateway para Anthropic: https://gateway.ai.cloudflare.com/v1/<ACCOUNT_ID>/<GATEWAY>/anthropic
-    "AI_GATEWAY_URL": ""
+    "AI_GATEWAY_URL": "",
+    // Enlace "Abrir en Doctoralia" cuando el evento no trae uno propio (p. ej. la agenda del panel de Doctoralia)
+    "DOCTORALIA_CALENDAR_URL": "https://www.doctoralia.com.mx"
+    // La dirección iCal privada del calendario va como secreto: `wrangler secret put DOCTORALIA_ICS_URL`
+  },
+  // Tareas programadas: sincronizar Doctoralia cada 15 min y respaldo diario (09:00 UTC = 03:00 en León)
+  "triggers": {
+    "crons": ["*/15 * * * *", "0 9 * * *"]
   },
   // Límite de uso del asistente de IA por usuario (Workers Rate Limiting)
   "ratelimits": [

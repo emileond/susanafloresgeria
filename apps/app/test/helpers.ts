@@ -1,6 +1,6 @@
 import { createExecutionContext, waitOnExecutionContext } from 'cloudflare:test';
 import { env } from 'cloudflare:workers';
-import app from '../src/worker/index';
+import worker from '../src/worker/index';
 
 export const DOCTOR_EMAIL = 'doctora@example.com';
 
@@ -13,7 +13,7 @@ export async function call(path: string, init: RequestInit & { json?: unknown } 
     body: json !== undefined ? JSON.stringify(json) : rest.body,
   });
   const ctx = createExecutionContext();
-  const res = await app.fetch(req, { ...env, ...envOverrides }, ctx);
+  const res = await worker.fetch(req, { ...env, ...envOverrides }, ctx);
   await waitOnExecutionContext(ctx);
   return res;
 }

@@ -8,6 +8,7 @@ import {
   ClipboardList,
   Droplet,
   FilePlus2,
+  FileSignature,
   FileText,
   FolderOpen,
   LayoutDashboard,
@@ -47,6 +48,7 @@ const TABS: Tab[] = [
   { to: '/pacientes/$patientId/escalas', label: 'Escalas', icon: ClipboardList, exact: false, clinical: true, count: (p) => p.summary.assessmentsCount },
   { to: '/pacientes/$patientId/archivos', label: 'Archivos', icon: FolderOpen, exact: false, clinical: true, count: (p) => p.summary.filesCount },
   { to: '/pacientes/$patientId/medicamentos', label: 'Medicamentos', icon: Pill, exact: false, clinical: true, count: (p) => p.summary.activeMedications },
+  { to: '/pacientes/$patientId/recetas', label: 'Recetas', icon: FileSignature, exact: false, clinical: true, count: (p) => p.summary.prescriptionsCount },
   { to: '/pacientes/$patientId/datos', label: 'Datos', icon: UserRound, exact: false, clinical: false },
 ];
 
@@ -136,7 +138,7 @@ function PatientLayout() {
                 <Upload aria-hidden /> <span className="sm:hidden">Archivo</span>
                 <span className="hidden sm:inline">Subir archivo</span>
               </Link>
-              <Link to="/agenda" className={actionClass}>
+              <Link to="/agenda" search={{ nuevo: patientId }} className={actionClass}>
                 <CalendarPlus aria-hidden /> Agendar
               </Link>
             </div>

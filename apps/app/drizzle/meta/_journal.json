@@ -29,6 +29,27 @@
       "when": 1793850980116,
       "tag": "0003_assessments_immutable",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1793851887304,
+      "tag": "0004_prescriptions",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1793851892617,
+      "tag": "0005_prescriptions_immutable",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1793852995977,
+      "tag": "0006_agenda",
+      "breakpoints": true
     }
   ]
 }
