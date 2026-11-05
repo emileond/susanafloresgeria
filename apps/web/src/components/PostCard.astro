@@ -1,0 +1,41 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import { formatDate, readingTime } from '../lib/blog';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+  /** "mist" sobre fondo blanco, "white" sobre fondo gris */
+  variant?: 'mist' | 'white';
+  featured?: boolean;
+}
+const { post, variant = 'mist', featured = false } = Astro.props;
+const bg = variant === 'white' ? 'bg-white hover:bg-brand-50' : 'bg-mist hover:bg-line/70';
+---
+
+<article
+  class:list={[
+    'group relative flex flex-col rounded-[1.75rem] p-6 transition-colors sm:p-7',
+    bg,
+    featured && 'lg:p-10',
+  ]}
+  data-category={post.data.category}
+>
+  <p class="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted">
+    <span class:list={['rounded-full px-3 py-1 font-semibold text-brand-700', variant === 'white' ? 'bg-brand-50' : 'bg-white']}>
+      {post.data.category}
+    </span>
+    <span>{readingTime(post.body)} min de lectura</span>
+  </p>
+  <h3 class:list={['mt-4 leading-snug', featured ? 'text-2xl sm:text-[2rem] sm:leading-tight' : 'text-xl sm:text-[1.35rem]']}>
+    <a href={`/blog/${post.id}/`} class="after:absolute after:inset-0">{post.data.title}</a>
+  </h3>
+  {post.data.excerpt && <p class:list={['mt-3 flex-1 text-muted', featured ? 'text-lg' : 'text-base']}>{post.data.excerpt}</p>}
+  <p class="mt-6 flex items-center justify-between gap-3 text-base">
+    <time class="text-sm text-muted" datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+    <span class="inline-flex items-center gap-1.5 font-semibold" aria-hidden="true">
+      Leer
+      <ArrowRight class="size-4 transition-transform group-hover:translate-x-1" />
+    </span>
+  </p>
+</article>

@@ -1,0 +1,31 @@
+---
+import { Image } from 'astro:assets';
+import BadgeCheck from '@lucide/astro/icons/badge-check';
+import headshot from '../assets/headshot.png';
+import { site } from '../config/site';
+---
+
+<!-- Autoría visible: importante para la confianza y para Google en temas de salud -->
+<aside class="flex flex-col gap-5 rounded-[1.75rem] bg-mist p-6 sm:flex-row sm:items-center sm:p-8" aria-label="Sobre la autora">
+  <Image
+    src={headshot}
+    alt={site.name}
+    widths={[160]}
+    sizes="80px"
+    class="size-20 shrink-0 rounded-full object-cover object-top"
+  />
+  <div>
+    <p class="text-sm font-semibold text-brand-700">Escrito por</p>
+    <p class="mt-0.5 text-xl font-bold">{site.name}</p>
+    <p class="mt-1 text-base text-muted">
+      Médica geriatra en León, Gto. Especialidad en Geriatría por la Universidad Autónoma de Yucatán.
+    </p>
+    <p class="mt-2 inline-flex items-center gap-1.5 text-sm text-muted">
+      <BadgeCheck class="size-4 text-brand-700" aria-hidden="true" />
+      Cédulas profesionales {site.credentials.cedulas.join(' y ')}
+    </p>
+    <p class="mt-3">
+      <a href="/#sobre-mi" class="link text-base">Conocer más sobre la doctora</a>
+    </p>
+  </div>
+</aside>

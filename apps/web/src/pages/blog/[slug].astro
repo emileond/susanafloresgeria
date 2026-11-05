@@ -1,0 +1,259 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PostCard from '../../components/PostCard.astro';
+import BookingCTA from '../../components/BookingCTA.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { getSortedPosts, formatDate, readingTime, relatedPosts } from '../../lib/blog';
+import { site } from '../../config/site';
+import ChevronRight from '@lucide/astro/icons/chevron-right';
+import ChevronDown from '@lucide/astro/icons/chevron-down';
+import CalendarCheck from '@lucide/astro/icons/calendar-check';
+import ListChecks from '@lucide/astro/icons/list-checks';
+import Clock from '@lucide/astro/icons/clock';
+
+export async function getStaticPaths() {
+  const posts = await getSortedPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post, posts } }));
+}
+
+const { post, posts } = Astro.props;
+const { Content, headings } = await render(post);
+const { title, excerpt, description, date, updated, category, summary, faqs, cta } = post.data;
+
+const toc = headings.filter((h) => h.depth === 2);
+const related = relatedPosts(post, posts);
+const minutes = readingTime(post.body);
+const url = new URL(`/blog/${post.id}/`, site.url).href;
+const metaDescription = description ?? excerpt;
+
+const jsonLd: Record<string, unknown>[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: title,
+    description: metaDescription,
+    datePublished: date.toISOString(),
+    dateModified: (updated ?? date).toISOString(),
+    inLanguage: 'es-MX',
+    articleSection: category,
+    image: new URL('/og-image.jpg', site.url).href,
+    author: { '@type': 'Physician', name: site.name, '@id': `${site.url}/#physician`, url: `${site.url}/#sobre-mi` },
+    publisher: { '@id': `${site.url}/#physician` },
+    mainEntityOfPage: url,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: site.url },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: `${site.url}/blog/` },
+      { '@type': 'ListItem', position: 3, name: title, item: url },
+    ],
+  },
+];
+if (faqs?.length) {
+  jsonLd.push({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  });
+}
+---
+
+<Base title={title} description={metaDescription} type="article" jsonLd={jsonLd}>
+  <article>
+    <!-- Encabezado -->
+    <header class="panel bg-brand-50">
+      <div class="container-page py-10 sm:py-14">
+        <nav aria-label="Ruta de navegación" class="text-base text-muted">
+          <ol class="flex flex-wrap items-center gap-1.5">
+            <li><a href="/" class="hover:text-ink hover:underline">Inicio</a></li>
+            <li aria-hidden="true"><ChevronRight class="size-4" /></li>
+            <li><a href="/blog/" class="hover:text-ink hover:underline">Blog</a></li>
+            <li aria-hidden="true"><ChevronRight class="size-4" /></li>
+            <li class="font-semibold text-ink">{category}</li>
+          </ol>
+        </nav>
+
+        <div class="mt-6 max-w-3xl">
+          <h1 class="text-[2.1rem] leading-[1.12] sm:text-5xl">{title}</h1>
+          {excerpt && <p class="mt-5 text-xl leading-relaxed text-ink/75 sm:text-[1.35rem]">{excerpt}</p>}
+          <div class="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-base text-muted">
+            <span class="flex items-center gap-2.5">
+              <img src="/logo-mark.svg" alt="" width="32" height="32" class="size-8 rounded-full bg-white p-1" />
+              <span><strong class="font-semibold text-ink">{site.name}</strong> · Geriatra</span>
+            </span>
+            <span>
+              {updated ? 'Actualizado el ' : 'Publicado el '}
+              <time datetime={(updated ?? date).toISOString()}>{formatDate(updated ?? date)}</time>
+            </span>
+            <span class="inline-flex items-center gap-1.5"><Clock class="size-4" aria-hidden="true" /> {minutes} min de lectura</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container-page grid gap-10 py-10 sm:py-14 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-14 xl:gap-20">
+      <div class="min-w-0 max-w-[44rem]">
+        <!-- Índice en móvil -->
+        {
+          toc.length > 2 && (
+            <details class="group mb-8 rounded-2xl border border-line lg:hidden">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-lg font-bold [&::-webkit-details-marker]:hidden">
+                En este artículo
+                <ChevronDown class="size-5 transition-transform group-open:rotate-180" aria-hidden="true" />
+              </summary>
+              <ol class="space-y-2 px-5 pb-5 text-base">
+                {toc.map((h) => (
+                  <li>
+                    <a href={`#${h.slug}`} class="text-muted hover:text-brand-700">
+                      {h.text}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </details>
+          )
+        }
+
+        <!-- En resumen -->
+        {
+          summary && summary.length > 0 && (
+            <section class="mb-10 rounded-[1.75rem] bg-mist p-6 sm:p-8" aria-labelledby="resumen">
+              <h2 id="resumen" class="flex items-center gap-2.5 text-xl">
+                <ListChecks class="size-6 text-brand-700" aria-hidden="true" />
+                En resumen
+              </h2>
+              <ul class="mt-4 space-y-3 text-lg">
+                {summary.map((s) => (
+                  <li class="flex gap-3">
+                    <span class="mt-2.5 size-2 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+                    {s}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+
+        <div class="article-body">
+          <Content />
+        </div>
+
+        <!-- Preguntas frecuentes del artículo -->
+        {
+          faqs && faqs.length > 0 && (
+            <section class="mt-16" aria-labelledby="preguntas-articulo">
+              <h2 id="preguntas-articulo" class="text-[1.65rem] sm:text-[2rem]">
+                Preguntas frecuentes
+              </h2>
+              <div class="mt-6 space-y-3">
+                {faqs.map((f) => (
+                  <details class="group rounded-[1.5rem] bg-mist px-6 transition-colors open:bg-brand-50">
+                    <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-lg font-bold [&::-webkit-details-marker]:hidden">
+                      {f.q}
+                      <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-white">
+                        <ChevronDown class="size-5 transition-transform group-open:rotate-180" aria-hidden="true" />
+                      </span>
+                    </summary>
+                    <p class="pb-6 text-lg text-ink/80">{f.a}</p>
+                  </details>
+                ))}
+              </div>
+            </section>
+          )
+        }
+
+        <div class="mt-14">
+          <BookingCTA title={cta?.title} text={cta?.text} />
+        </div>
+
+        <div class="mt-6">
+          <AuthorBox />
+        </div>
+
+        <p class="mt-6 text-base text-muted">
+          Este artículo es informativo y no sustituye una valoración médica. Si nota cambios en la salud de su familiar,
+          consulte a su médico.
+        </p>
+      </div>
+
+      <!-- Barra lateral (escritorio) -->
+      <aside class="hidden lg:block">
+        <div class="sticky top-28 space-y-6">
+          {
+            toc.length > 2 && (
+              <nav aria-label="En este artículo">
+                <p class="text-base font-bold">En este artículo</p>
+                <ol class="mt-3 space-y-1 border-l-2 border-line text-base">
+                  {toc.map((h) => (
+                    <li>
+                      <a
+                        href={`#${h.slug}`}
+                        data-toc-link={h.slug}
+                        class="-ml-0.5 block border-l-2 border-transparent py-1 pl-4 leading-snug text-muted transition-colors hover:text-ink data-[active]:border-brand-700 data-[active]:font-semibold data-[active]:text-ink"
+                      >
+                        {h.text}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+            )
+          }
+
+          <div class="rounded-[1.75rem] bg-brand-50 p-6">
+            <p class="text-lg leading-snug font-bold">¿Le preocupa su familiar?</p>
+            <p class="mt-2 text-base text-ink/75">Una valoración geriátrica le da claridad y un plan a seguir.</p>
+            <div class="mt-5 grid gap-2.5">
+              <a href="/#agendar" class="btn btn-primary w-full !px-4 !text-base">
+                <CalendarCheck aria-hidden="true" />
+                Agendar cita
+              </a>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    {
+      related.length > 0 && (
+        <section class="panel mb-2.5 bg-mist sm:mb-4" aria-labelledby="mas-guias">
+          <div class="container-page py-14 sm:py-20">
+            <h2 id="mas-guias" class="section-title">
+              Otras guías que pueden ayudarle
+            </h2>
+            <div class="mt-8 grid gap-4 md:grid-cols-3">
+              {related.map((p) => (
+                <PostCard post={p} variant="white" />
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
+  </article>
+</Base>
+
+<script>
+  // Resalta en el índice la sección que se está leyendo
+  const links = document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]');
+  if (links.length && 'IntersectionObserver' in window) {
+    const byId = new Map([...links].map((a) => [a.dataset.tocLink!, a]));
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          links.forEach((l) => l.removeAttribute('data-active'));
+          byId.get(e.target.id)?.setAttribute('data-active', '');
+        });
+      },
+      { rootMargin: '-20% 0px -70% 0px' },
+    );
+    byId.forEach((_, id) => {
+      const el = document.getElementById(id);
+      if (el) io.observe(el);
+    });
+  }
+</script>

@@ -1,0 +1,15 @@
+---
+// Separador curvo y suave entre secciones (rellena con el color de la sección siguiente).
+interface Props {
+  fill?: string;
+  flip?: boolean;
+  class?: string;
+}
+const { fill = 'var(--color-mist)', flip = false, class: className = '' } = Astro.props;
+---
+
+<div aria-hidden="true" class:list={['pointer-events-none -mb-px leading-[0]', flip && 'rotate-180', className]}>
+  <svg viewBox="0 0 1440 80" preserveAspectRatio="none" class="h-10 w-full sm:h-16 lg:h-20">
+    <path d="M0 80V42C240 6 480 0 720 18s480 46 720 14v48H0Z" fill={fill}></path>
+  </svg>
+</div>

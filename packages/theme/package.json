@@ -1,0 +1,22 @@
+{
+  "name": "@susanafloresgeria/theme",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Colores, tipografía y tokens de Tailwind compartidos por el sitio web y la app.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "style": "./theme.css",
+      "default": "./theme.css"
+    },
+    "./theme.css": "./theme.css",
+    "./logo-mark.svg": "./logo-mark.svg"
+  },
+  "files": [
+    "theme.css",
+    "logo-mark.svg"
+  ],
+  "dependencies": {
+    "@fontsource-variable/figtree": "^5.3.0"
+  }
+}

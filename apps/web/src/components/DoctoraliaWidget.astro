@@ -1,0 +1,51 @@
+---
+import { site } from '../config/site';
+---
+
+<!--
+  Widget de reservas de Doctoralia. El script se carga solo cuando el usuario
+  se acerca a esta sección para no hacer más lenta la carga inicial de la página.
+-->
+<div class="min-h-[420px]" data-doctoralia>
+  <a
+    id="zl-url"
+    class="zl-url link"
+    href={site.doctoralia.url}
+    rel="nofollow noopener"
+    target="_blank"
+    data-zlw-doctor={site.doctoralia.slug}
+    data-zlw-type="big_with_calendar"
+    data-zlw-opinion="false"
+    data-zlw-hide-branding="true"
+    data-zlw-saas-only="true"
+    data-zlw-a11y-title="Calendario para reservar cita con la Dra. Susana Flores"
+  >
+    Ver horarios disponibles en Doctoralia
+  </a>
+</div>
+
+<script>
+  const el = document.querySelector('[data-doctoralia]');
+  const load = () => {
+    if (document.getElementById('zl-widget-s')) return;
+    const s = document.createElement('script');
+    s.id = 'zl-widget-s';
+    s.src = 'https://platform.docplanner.com/js/widget.js';
+    s.async = true;
+    document.body.appendChild(s);
+  };
+  if (el && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          load();
+          io.disconnect();
+        }
+      },
+      { rootMargin: '800px 0px' },
+    );
+    io.observe(el);
+  } else {
+    load();
+  }
+</script>

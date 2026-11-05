@@ -1,48 +1,52 @@
-# React + Vite
+# Dra. Susana Flores Alonso — Geriatra en León
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-
-
-## Blog en Markdown
-
-Para facilitar el mantenimiento por personas no técnicas, los artículos del blog se escriben en archivos Markdown con frontmatter.
-
-- Carpeta de posts: `src/content/blog/`
-- Formato de archivo (`.md`) con frontmatter YAML:
+Monorepo con npm workspaces:
 
 ```
----
-slug: mi-primer-post
-title: "Título del artículo"
-date: 2026-01-03
-excerpt: "Resumen corto para la tarjeta del blog."
----
-
-Contenido en Markdown...
+apps/
+  web/          Sitio público (Astro + Tailwind): inicio, servicios y blog → susanafloresgeria.com
+  app/          (próximamente) App de expedientes para la doctora: Vite + React + Cloudflare Workers, D1 y R2
+packages/
+  theme/        Colores, tipografía y logo compartidos (tokens de Tailwind)
 ```
 
-- La lista de artículos y las páginas de detalle se generan automáticamente:
-  - Listado: `/blog`
-  - Detalle: `/blog/{slug}`
+## Comandos (desde la raíz)
 
-### Agregar un nuevo artículo
-1. Cree un archivo `.md` en `src/content/blog/` siguiendo el formato anterior.
-2. Use un `slug` en minúsculas, con guiones y sin acentos.
-3. Guarde el archivo. El sitio lo detectará automáticamente durante el build/servidor de desarrollo.
+| Comando             | Acción                                             |
+| ------------------- | -------------------------------------------------- |
+| `npm install`       | Instala las dependencias de todos los paquetes     |
+| `npm run dev`       | Sitio web en `http://localhost:4321`               |
+| `npm run build`     | Compila todos los proyectos                        |
+| `npm run build:web` | Compila solo el sitio web (`apps/web/dist/`)       |
+| `npm run check`     | Revisa errores de tipos en todos los proyectos     |
 
-### Notas
-- La fecha se muestra con formato local `es-MX`.
-- El contenido Markdown soporta listas, encabezados, tablas y enlaces (GFM).
+Para un comando de un solo proyecto: `npm run <script> -w @susanafloresgeria/web`.
+
+## Tema compartido
+
+`packages/theme/theme.css` define los colores (`brand`, `mist`, `ink`, `accent`…) y la tipografía (Figtree).
+Cualquier proyecto con Tailwind v4 lo usa así:
+
+```css
+@import "tailwindcss";
+@import "@susanafloresgeria/theme";
+```
+
+Agregue `"@susanafloresgeria/theme": "*"` a las dependencias del proyecto. Un cambio de color en ese archivo se refleja en el sitio y en la app.
+
+## Despliegue
+
+Cada app es su propio Worker de Cloudflare, desplegado desde este mismo repositorio. Así, un cambio en el blog no vuelve a desplegar la app de expedientes y viceversa.
+
+**Sitio web** (`apps/web/wrangler.jsonc`, Worker `susanafloresgeria-web`), con Workers Builds conectado a GitHub:
+
+| Ajuste | Valor |
+| --- | --- |
+| Root directory | *(raíz del repositorio)* |
+| Build command | `npm run build:web` |
+| Deploy command | `npx wrangler deploy -c apps/web/wrangler.jsonc` |
+| Build watch paths | `apps/web/*`, `packages/theme/*` |
+
+Despliegue manual desde la computadora: `npm run deploy:web`.
+
+Detalles de cada proyecto en su propio README: [apps/web](apps/web/README.md).

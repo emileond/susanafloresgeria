@@ -1,0 +1,73 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostCard from '../../components/PostCard.astro';
+import BookingCTA from '../../components/BookingCTA.astro';
+import Underline from '../../components/Underline.astro';
+import { getSortedPosts } from '../../lib/blog';
+import { categories } from '../../content.config';
+
+const posts = await getSortedPosts();
+const [featured, ...rest] = posts;
+const usedCategories = categories.filter((c) => posts.some((p) => p.data.category === c));
+---
+
+<Base
+  title="Guías para familias y cuidadores de personas mayores"
+  description="Guías prácticas de la Dra. Susana Flores, geriatra en León, para cuidar mejor a su familiar mayor: memoria y demencia, caídas, medicamentos, cuidado del cuidador y más."
+>
+  <section class="panel bg-brand-50">
+    <div class="container-page py-12 sm:py-16">
+      <div class="max-w-2xl">
+        <p class="eyebrow">Blog</p>
+        <h1 class="mt-4 text-[2.4rem] leading-[1.1] sm:text-5xl">Guías para cuidar mejor a su <Underline>familiar</Underline></h1>
+        <p class="mt-5 text-lg text-ink/75 sm:text-xl">
+          Información clara y práctica, escrita por una geriatra, para las familias y cuidadores de personas mayores.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="container-page py-12 sm:py-16">
+    {featured && (
+      <div class="grid">
+        <PostCard post={featured} featured />
+      </div>
+    )}
+
+    <div class="mt-12 flex flex-wrap gap-2" role="group" aria-label="Filtrar por tema">
+      <button type="button" class="filter-chip" data-filter="all" aria-pressed="true">Todos</button>
+      {usedCategories.map((c) => (
+        <button type="button" class="filter-chip" data-filter={c} aria-pressed="false">{c}</button>
+      ))}
+    </div>
+
+    <div class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3" data-posts>
+      {rest.map((p) => <PostCard post={p} />)}
+    </div>
+    <p class="mt-6 hidden text-lg text-muted" data-empty>El artículo más reciente de este tema aparece arriba.</p>
+
+    <div class="mt-16">
+      <BookingCTA />
+    </div>
+  </section>
+</Base>
+
+
+<script>
+  const chips = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+  const cards = document.querySelectorAll<HTMLElement>('[data-posts] [data-category]');
+  const empty = document.querySelector<HTMLElement>('[data-empty]');
+  chips.forEach((chip) =>
+    chip.addEventListener('click', () => {
+      const f = chip.dataset.filter;
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+      let shown = 0;
+      cards.forEach((card) => {
+        const match = f === 'all' || card.dataset.category === f;
+        card.hidden = !match;
+        if (match) shown++;
+      });
+      empty?.classList.toggle('hidden', shown > 0);
+    }),
+  );
+</script>
