@@ -1,4 +1,4 @@
-import { band, maxOf, sumAnswers, type ScaleDefinition, type ScaleItem } from './types';
+import { band, maxOf, sumAnswers, type ScaleDefinition, type ScaleItem, type Band } from './types';
 
 const E = 'Equilibrio';
 const M = 'Marcha';
@@ -31,10 +31,10 @@ const gait: ScaleItem[] = [
 
 const items = [...balance, ...gait];
 
-const BANDS = [
-  { min: 25, interpretation: 'Riesgo bajo de caídas', severity: 'normal' as const },
-  { min: 19, interpretation: 'Riesgo moderado de caídas', severity: 'moderate' as const },
-  { min: 0, interpretation: 'Riesgo alto de caídas', severity: 'severe' as const },
+const BANDS: Band[] = [
+  { min: 25, interpretation: 'Riesgo bajo de caídas', severity: 'normal' },
+  { min: 19, interpretation: 'Riesgo moderado de caídas', severity: 'moderate' },
+  { min: 0, interpretation: 'Riesgo alto de caídas', severity: 'severe' },
 ];
 
 export const tinetti: ScaleDefinition = {
@@ -47,6 +47,7 @@ export const tinetti: ScaleDefinition = {
   respondent: 'observacion',
   minutes: 10,
   higherIsBetter: true,
+  bands: BANDS,
   reference: 'Tinetti ME. J Am Geriatr Soc. 1986;34:119-26.',
   items,
   score(answers) {

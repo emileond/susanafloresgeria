@@ -1,4 +1,4 @@
-import { band, sumAnswers, yesNo, type ScaleDefinition, type ScaleItem } from './types';
+import { band, sumAnswers, yesNo, type ScaleDefinition, type ScaleItem, type Band } from './types';
 
 const items: ScaleItem[] = [
   { id: 'fatiga', text: 'Fatiga: ¿se ha sentido cansado(a) todo o la mayor parte del tiempo en las últimas 4 semanas?', options: yesNo(1) },
@@ -13,10 +13,10 @@ const items: ScaleItem[] = [
   { id: 'peso', text: 'Pérdida de peso: ¿ha perdido más del 5 % de su peso en el último año?', options: yesNo(1) },
 ];
 
-const BANDS = [
-  { min: 3, interpretation: 'Frágil', severity: 'severe' as const },
-  { min: 1, interpretation: 'Prefrágil', severity: 'mild' as const },
-  { min: 0, interpretation: 'Robusto', severity: 'normal' as const },
+const BANDS: Band[] = [
+  { min: 3, interpretation: 'Frágil', severity: 'severe' },
+  { min: 1, interpretation: 'Prefrágil', severity: 'mild' },
+  { min: 0, interpretation: 'Robusto', severity: 'normal' },
 ];
 
 export const frail: ScaleDefinition = {
@@ -29,6 +29,7 @@ export const frail: ScaleDefinition = {
   respondent: 'paciente',
   minutes: 2,
   higherIsBetter: false,
+  bands: BANDS,
   reference: 'Morley JE, Malmstrom TK, Miller DK. J Nutr Health Aging. 2012;16:601-8.',
   items,
   score(answers) {

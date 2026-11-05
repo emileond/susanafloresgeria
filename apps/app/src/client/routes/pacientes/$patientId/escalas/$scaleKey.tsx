@@ -1,15 +1,16 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { ArrowLeft, Info, Save } from 'lucide-react';
+import { ArrowLeft, Check, Info, Save } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { NOTE_TYPE_LABELS } from '../../../../../shared/constants';
 import { formatDate, todayISO } from '../../../../../shared/format';
-import { missingAnswers, SCALES_BY_KEY, type Answers, type ScaleDefinition } from '../../../../../shared/scales';
+import { maxOf, missingAnswers, pointsOf, SCALES_BY_KEY, type Answers, type ScaleDefinition } from '../../../../../shared/scales';
 import type { AssessmentInput } from '../../../../../shared/schemas';
 import { Button } from '../../../../components/ui/Button';
 import { Field, Input, Select, Textarea } from '../../../../components/ui/Field';
 import { Badge, EmptyState } from '../../../../components/ui/misc';
-import { RESPONDENT_LABELS, SEVERITY_TONE } from '../../../../features/scaleUi';
+import { ScoreGauge } from '../../../../components/scales/ScoreGauge';
+import { RESPONDENT_LABELS, SEVERITY_STYLE, SEVERITY_TONE } from '../../../../features/scaleUi';
 import { ApiError } from '../../../../lib/api';
 import { cn } from '../../../../lib/cn';
 import { useCreateAssessment, useMe, useNotes } from '../../../../lib/queries';
@@ -50,10 +51,27 @@ function Runner({ scale, patientId }: { scale: ScaleDefinition; patientId: strin
 
   const sections = [...new Set(scale.items.map((i) => i.section ?? ''))];
 
+  const scrollToItem = (id?: string) => {
+    if (id) document.getElementById(`item-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
+  /** Al responder una pregunta por primera vez, se avanza a la siguiente sin responder. */
+  const choose = (itemId: string, optionIndex: number) => {
+    setAnswers((prev) => {
+      const next = { ...prev, [itemId]: optionIndex };
+      if (prev[itemId] === undefined) {
+        const idx = scale.items.findIndex((i) => i.id === itemId);
+        const pending = [...scale.items.slice(idx + 1), ...scale.items.slice(0, idx)].find((i) => next[i.id] === undefined);
+        if (pending) setTimeout(() => scrollToItem(pending.id), 120);
+      }
+      return next;
+    });
+  };
+
   const save = async () => {
     if (!complete) {
       toast.error(`Faltan ${missing.length} respuesta(s).`);
-      document.getElementById(`item-${missing[0]}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      scrollToItem(missing[0]);
       return;
     }
     const attachInput: AssessmentInput['attach'] =
@@ -102,22 +120,44 @@ function Runner({ scale, patientId }: { scale: ScaleDefinition; patientId: strin
         </Field>
       </div>
 
-      {sections.map((section) => (
-        <fieldset key={section || 'all'} className="mt-6">
-          {section && <legend className="mb-3 text-lg font-bold">{section}</legend>}
-          <ol className="grid gap-3">
-            {scale.items
-              .filter((i) => (i.section ?? '') === section)
-              .map((item) => {
+      {sections.map((section) => {
+        const sectionItems = scale.items.filter((i) => (i.section ?? '') === section);
+        const subtotal = sectionItems.reduce((acc, i) => acc + pointsOf(i, answers), 0);
+        const sectionDone = sectionItems.every((i) => answers[i.id] !== undefined);
+        return (
+          <fieldset key={section || 'all'} className="mt-6">
+            {section && (
+              <legend className="mb-3 flex w-full items-center justify-between gap-3">
+                <span className="text-lg font-bold">{section}</span>
+                <span className={cn('rounded-full px-2.5 py-0.5 text-sm font-bold tabular-nums', sectionDone ? 'bg-brand-50 text-brand-800' : 'bg-mist text-muted')}>
+                  {subtotal}/{maxOf(sectionItems)}
+                </span>
+              </legend>
+            )}
+            <ol className="grid gap-3">
+              {sectionItems.map((item) => {
                 const idx = scale.items.indexOf(item);
+                const done = answers[item.id] !== undefined;
                 return (
-                  <li key={item.id} id={`item-${item.id}`} className="card p-4 sm:p-5">
-                    <p className="font-semibold">
-                      <span className="mr-1.5 text-muted">{idx + 1}.</span>
-                      {item.text}
+                  <li key={item.id} id={`item-${item.id}`} className={cn('card scroll-mt-32 p-4 transition-colors sm:p-5', done && 'border-brand-100 bg-brand-50/30')}>
+                    <p className="flex gap-2.5 font-semibold">
+                      <span
+                        className={cn(
+                          'inline-flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold',
+                          done ? 'bg-brand-700 text-white' : 'bg-mist text-muted',
+                        )}
+                        aria-hidden
+                      >
+                        {done ? <Check className="size-3.5" strokeWidth={3} /> : idx + 1}
+                      </span>
+                      <span>{item.text}</span>
                     </p>
-                    {item.help && <p className="mt-1 text-sm text-muted">{item.help}</p>}
-                    <div role="radiogroup" aria-label={item.text} className={cn('mt-3 grid gap-2', item.options.length === 2 && item.options.every((o) => o.label.length < 6) ? 'grid-cols-2 sm:max-w-sm' : '')}>
+                    {item.help && <p className="mt-1 pl-8.5 text-sm text-muted">{item.help}</p>}
+                    <div
+                      role="radiogroup"
+                      aria-label={item.text}
+                      className={cn('mt-3 grid gap-2 sm:pl-8.5', item.options.length === 2 && item.options.every((o) => o.label.length < 6) ? 'grid-cols-2 sm:max-w-sm' : '')}
+                    >
                       {item.options.map((opt, oi) => {
                         const selected = answers[item.id] === oi;
                         return (
@@ -126,14 +166,19 @@ function Runner({ scale, patientId }: { scale: ScaleDefinition; patientId: strin
                             type="button"
                             role="radio"
                             aria-checked={selected}
-                            onClick={() => setAnswers((a) => ({ ...a, [item.id]: oi }))}
+                            onClick={() => choose(item.id, oi)}
                             className={cn(
                               'flex items-center justify-between gap-3 rounded-xl border px-3.5 py-2.5 text-left text-[15px] transition-colors',
-                              selected ? 'border-brand-700 bg-brand-50 font-semibold text-brand-800' : 'border-line hover:border-ink/25 hover:bg-mist/60',
+                              selected ? 'border-brand-700 bg-white font-semibold text-brand-800 ring-2 ring-brand-100' : 'border-line bg-white hover:border-ink/25 hover:bg-mist/60',
                             )}
                           >
-                            <span>{opt.label}</span>
-                            <span className={cn('shrink-0 rounded-md px-1.5 text-xs font-bold', selected ? 'bg-brand-700 text-white' : 'bg-mist text-muted')}>{opt.value}</span>
+                            <span className="flex items-center gap-2.5">
+                              <span className={cn('inline-flex size-4.5 shrink-0 items-center justify-center rounded-full border-2', selected ? 'border-brand-700' : 'border-ink/25')} aria-hidden>
+                                {selected && <span className="size-2 rounded-full bg-brand-700" />}
+                              </span>
+                              {opt.label}
+                            </span>
+                            <span className={cn('shrink-0 rounded-md px-1.5 text-xs font-bold tabular-nums', selected ? 'bg-brand-700 text-white' : 'bg-mist text-muted')}>{opt.value}</span>
                           </button>
                         );
                       })}
@@ -141,9 +186,34 @@ function Runner({ scale, patientId }: { scale: ScaleDefinition; patientId: strin
                   </li>
                 );
               })}
-          </ol>
-        </fieldset>
-      ))}
+            </ol>
+          </fieldset>
+        );
+      })}
+
+      {/* Resultado completo al terminar */}
+      {result && (
+        <section aria-live="polite" className={cn('mt-8 rounded-2xl p-5 ring-1 sm:p-6', SEVERITY_STYLE[result.severity].soft, SEVERITY_STYLE[result.severity].ring)}>
+          <p className="text-sm font-bold tracking-wide text-muted uppercase">Resultado</p>
+          <div className="mt-1 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <span className={cn('text-4xl font-bold tabular-nums', SEVERITY_STYLE[result.severity].text)}>
+              {result.score}
+              <span className="text-lg opacity-70">/{result.maxScore}</span>
+            </span>
+            <span className={cn('text-xl font-bold', SEVERITY_STYLE[result.severity].text)}>{result.interpretation}</span>
+          </div>
+          {result.details?.length ? (
+            <p className="mt-1 flex flex-wrap gap-x-4 text-sm">
+              {result.details.map((d) => (
+                <span key={d.label}>
+                  {d.label}: <strong>{d.value}</strong>
+                </span>
+              ))}
+            </p>
+          ) : null}
+          <ScoreGauge scale={scale} score={result.score} className="mt-4" />
+        </section>
+      )}
 
       <div className="mt-6 grid gap-4">
         <Field label="Comentario (opcional)">{(id) => <Textarea id={id} rows={2} value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Condiciones de aplicación, observaciones…" />}</Field>
@@ -163,33 +233,39 @@ function Runner({ scale, patientId }: { scale: ScaleDefinition; patientId: strin
         <p className="text-xs text-muted">Referencia: {scale.reference}</p>
       </div>
 
-      {/* Puntuación en vivo */}
-      <div className="fixed inset-x-0 bottom-16 z-20 border-t border-line bg-white/95 px-4 py-3 backdrop-blur lg:bottom-0 lg:left-64">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 sm:px-4">
-          <div className="flex flex-wrap items-center gap-2" aria-live="polite">
+      {/* Barra fija: progreso o puntuación en vivo */}
+      <div className="fixed inset-x-0 bottom-16 z-20 border-t border-line bg-white/95 backdrop-blur lg:bottom-0 lg:left-64">
+        <div className="h-1 bg-mist" aria-hidden>
+          <div className="h-full bg-brand-700 transition-all duration-300" style={{ width: `${(answered / scale.items.length) * 100}%` }} />
+        </div>
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:px-8">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1" aria-live="polite">
             {result ? (
               <>
-                <span className="text-2xl font-bold">
+                <span className={cn('text-2xl font-bold tabular-nums', SEVERITY_STYLE[result.severity].text)}>
                   {result.score}
-                  <span className="text-base font-semibold text-muted">/{result.maxScore}</span>
+                  <span className="text-base font-semibold opacity-70">/{result.maxScore}</span>
                 </span>
-                <Badge tone={SEVERITY_TONE[result.severity]} className="text-sm">
+                <Badge tone={SEVERITY_TONE[result.severity]} className="truncate text-sm">
                   {result.interpretation}
                 </Badge>
-                {result.details?.map((d) => (
-                  <span key={d.label} className="text-sm text-muted">
-                    {d.label}: <strong className="text-ink">{d.value}</strong>
-                  </span>
-                ))}
               </>
             ) : (
-              <span className="text-sm text-muted">
-                {answered}/{scale.items.length} respondidas
-              </span>
+              <>
+                <span className="text-sm font-semibold">
+                  {answered} de {scale.items.length} respondidas
+                </span>
+                {answered > 0 && (
+                  <button className="text-sm font-semibold text-brand-700 hover:underline" onClick={() => scrollToItem(missing[0])}>
+                    Ir a la siguiente pendiente
+                  </button>
+                )}
+              </>
             )}
           </div>
-          <Button onClick={save} loading={create.isPending} disabled={!complete}>
-            <Save aria-hidden /> Guardar resultado
+          <Button onClick={save} loading={create.isPending} disabled={!complete} className="shrink-0">
+            <Save aria-hidden /> <span className="hidden sm:inline">Guardar resultado</span>
+            <span className="sm:hidden">Guardar</span>
           </Button>
         </div>
       </div>

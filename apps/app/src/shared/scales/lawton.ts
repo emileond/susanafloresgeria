@@ -1,4 +1,4 @@
-import { band, sumAnswers, type ScaleDefinition, type ScaleItem } from './types';
+import { band, sumAnswers, type ScaleDefinition, type ScaleItem, type Band } from './types';
 
 const items: ScaleItem[] = [
   { id: 'telefono', text: 'Capacidad para usar el teléfono', options: [
@@ -50,12 +50,12 @@ const items: ScaleItem[] = [
   ] },
 ];
 
-const BANDS = [
-  { min: 8, interpretation: 'Independiente en actividades instrumentales', severity: 'normal' as const },
-  { min: 6, interpretation: 'Dependencia ligera', severity: 'mild' as const },
-  { min: 4, interpretation: 'Dependencia moderada', severity: 'moderate' as const },
-  { min: 2, interpretation: 'Dependencia severa', severity: 'severe' as const },
-  { min: 0, interpretation: 'Dependencia total', severity: 'severe' as const },
+const BANDS: Band[] = [
+  { min: 8, interpretation: 'Independiente en actividades instrumentales', severity: 'normal' },
+  { min: 6, interpretation: 'Dependencia ligera', severity: 'mild' },
+  { min: 4, interpretation: 'Dependencia moderada', severity: 'moderate' },
+  { min: 2, interpretation: 'Dependencia severa', severity: 'severe' },
+  { min: 0, interpretation: 'Dependencia total', severity: 'severe' },
 ];
 
 /**
@@ -72,6 +72,7 @@ export const lawton: ScaleDefinition = {
   respondent: 'paciente',
   minutes: 5,
   higherIsBetter: true,
+  bands: BANDS,
   reference: 'Lawton MP, Brody EM. Gerontologist. 1969;9:179-86.',
   notice: 'Puntuación sobre 8 ítems. En algunos protocolos se excluyen comida, casa y ropa en hombres (0–5).',
   items,

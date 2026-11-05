@@ -24,6 +24,10 @@ export const sarcf: ScaleDefinition = {
   respondent: 'paciente',
   minutes: 2,
   higherIsBetter: false,
+  bands: [
+    { min: 4, interpretation: 'Tamizaje positivo: sugiere sarcopenia', severity: 'moderate' },
+    { min: 0, interpretation: 'Tamizaje negativo', severity: 'normal' },
+  ],
   reference: 'Malmstrom TK, Morley JE. J Am Med Dir Assoc. 2013;14:531-2.',
   notice: 'Es un tamizaje: un resultado positivo se confirma con fuerza de prensión, masa muscular y desempeño físico.',
   items,

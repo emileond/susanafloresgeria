@@ -5,7 +5,8 @@ import { NOTE_TYPE_LABELS } from '../../../../shared/constants';
 import { formatDate } from '../../../../shared/format';
 import { SCALES_BY_KEY } from '../../../../shared/scales';
 import { Badge } from '../../../components/ui/misc';
-import { SEVERITY_TONE } from '../../../features/scaleUi';
+import { ScoreGauge } from '../../../components/scales/ScoreGauge';
+import { SEVERITY_STYLE } from '../../../features/scaleUi';
 import { useAssessments, useMe, useMedications, useNotes, usePatient } from '../../../lib/queries';
 
 export const Route = createFileRoute('/pacientes/$patientId/')({ component: Summary });
@@ -122,18 +123,25 @@ function Summary() {
       {clinical && (
         <Card title="Escalas recientes" icon={<ClipboardList />} action={seeAll('/pacientes/$patientId/escalas', patientId)}>
           {latest.length ? (
-            <ul className="grid gap-2">
-              {latest.slice(0, 5).map((a) => (
-                <li key={a.id} className="flex flex-wrap items-center gap-2">
-                  <span className="w-24 font-semibold">{SCALES_BY_KEY[a.scaleKey]?.shortName ?? a.scaleKey}</span>
-                  <Badge tone={SEVERITY_TONE[a.severity]}>
-                    {a.score}/{a.maxScore}
-                  </Badge>
-                  <span className="text-sm text-muted">
-                    {a.interpretation} · {formatDate(a.performedAt)}
-                  </span>
-                </li>
-              ))}
+            <ul className="grid gap-3">
+              {latest.slice(0, 4).map((a) => {
+                const scale = SCALES_BY_KEY[a.scaleKey];
+                const st = SEVERITY_STYLE[a.severity];
+                return (
+                  <li key={a.id}>
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="font-semibold">{scale?.shortName ?? a.scaleKey}</span>
+                      <span className={`text-sm font-bold tabular-nums ${st.text}`}>
+                        {a.score}/{a.maxScore}
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted">
+                      <span className={`font-semibold ${st.text}`}>{a.interpretation}</span> · {formatDate(a.performedAt)}
+                    </p>
+                    {scale && <ScoreGauge scale={scale} score={a.score} showLegend={false} className="-mt-3" />}
+                  </li>
+                );
+              })}
             </ul>
           ) : (
             <p className="text-muted">Aún no se han aplicado escalas.</p>

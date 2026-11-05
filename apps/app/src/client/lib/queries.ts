@@ -197,10 +197,10 @@ export function useCreateAssessment(patientId: string) {
     mutationFn: (input: AssessmentInput) => api<AssessmentItem>(`/patients/${patientId}/assessments`, { method: 'POST', json: input }),
     onSuccess: (a) => {
       void qc.invalidateQueries({ queryKey: qk.assessments(patientId) });
+      void qc.invalidateQueries({ queryKey: qk.patient(patientId) });
       if (a.noteId) {
         void qc.invalidateQueries({ queryKey: qk.notes(patientId) });
         void qc.invalidateQueries({ queryKey: qk.note(a.noteId) });
-        void qc.invalidateQueries({ queryKey: qk.patient(patientId) });
         void qc.invalidateQueries({ queryKey: qk.dashboard });
       }
     },

@@ -25,6 +25,13 @@ export const katz: ScaleDefinition = {
   respondent: 'observacion',
   minutes: 5,
   higherIsBetter: true,
+  // Para la visualización por número de actividades independientes; la letra de Katz se calcula aparte.
+  bands: [
+    { min: 6, interpretation: 'Independiente en todas las actividades', severity: 'normal' },
+    { min: 5, interpretation: 'Dependencia leve', severity: 'mild' },
+    { min: 3, interpretation: 'Dependencia moderada', severity: 'moderate' },
+    { min: 0, interpretation: 'Dependencia severa', severity: 'severe' },
+  ],
   reference: 'Katz S, et al. JAMA. 1963;185:914-9.',
   items,
   score(answers) {

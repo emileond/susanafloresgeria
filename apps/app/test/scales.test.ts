@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { enabledScales, missingAnswers, SCALES, SCALES_BY_KEY, type Answers, type ScaleDefinition } from '../src/shared/scales';
+import { enabledScales, maxOf, minOf, missingAnswers, scaleRanges, SCALES, SCALES_BY_KEY, type Answers, type ScaleDefinition } from '../src/shared/scales';
 
 /** Respuestas eligiendo, en cada ítem, la opción con más (o menos) puntos. */
 function extreme(scale: ScaleDefinition, pick: 'max' | 'min'): Answers {
@@ -28,6 +28,25 @@ describe('catálogo de escalas', () => {
     for (const s of SCALES) {
       const r = s.score(extreme(s, 'max'));
       expect(r.score, s.key).toBe(r.maxScore);
+    }
+  });
+
+  it('los rangos de interpretación cubren todo el puntaje sin huecos ni traslapes', () => {
+    for (const s of SCALES) {
+      const ranges = scaleRanges(s);
+      expect(ranges[0]!.from, s.key).toBe(minOf(s.items));
+      expect(ranges.at(-1)!.to, s.key).toBe(maxOf(s.items));
+      for (let i = 1; i < ranges.length; i++) expect(ranges[i]!.from, s.key).toBe(ranges[i - 1]!.to + 1);
+    }
+  });
+
+  it('la interpretación coincide con el rango del puntaje (excepto la letra de Katz)', () => {
+    for (const s of SCALES.filter((x) => x.key !== 'katz')) {
+      for (const pick of ['min', 'max'] as const) {
+        const r = s.score(extreme(s, pick));
+        const range = scaleRanges(s).find((x) => r.score >= x.from && r.score <= x.to)!;
+        expect(r.interpretation, `${s.key} ${pick}`).toBe(range.interpretation);
+      }
     }
   });
 

@@ -44,6 +44,7 @@ export interface PatientDetail extends PatientListItem {
     notesCount: number;
     draftNotes: number;
     filesCount: number;
+    assessmentsCount: number;
     historyVersion: number | null;
     lastNote: { id: string; visitDate: string; type: NoteType } | null;
   };

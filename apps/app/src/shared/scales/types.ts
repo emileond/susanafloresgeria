@@ -32,6 +32,13 @@ export interface ScaleResult {
 /** Respuestas: índice de la opción elegida por ítem (no el valor, porque varias opciones pueden valer lo mismo). */
 export type Answers = Record<string, number>;
 
+/** Tramo de interpretación: desde `min` puntos (hasta el siguiente tramo). */
+export interface Band {
+  min: number;
+  interpretation: string;
+  severity: Severity;
+}
+
 export interface ScaleDefinition {
   key: string;
   version: number;
@@ -46,6 +53,8 @@ export interface ScaleDefinition {
   higherIsBetter: boolean;
   items: ScaleItem[];
   score: (answers: Answers) => ScaleResult;
+  /** Tramos de interpretación (de mayor a menor), para mostrar la escala visualmente. */
+  bands: Band[];
   reference: string;
   /** Requiere confirmar condiciones de uso/licencia antes de habilitarse. */
   licensed?: boolean;
@@ -64,6 +73,27 @@ export function missingAnswers(items: ScaleItem[], answers: Answers): string[] {
   }).map((i) => i.id);
 }
 export const maxOf = (items: ScaleItem[]) => items.reduce((acc, item) => acc + Math.max(...item.options.map((o) => o.value)), 0);
+export const minOf = (items: ScaleItem[]) => items.reduce((acc, item) => acc + Math.min(...item.options.map((o) => o.value)), 0);
+
+export interface ScaleRange {
+  from: number;
+  to: number;
+  interpretation: string;
+  severity: Severity;
+}
+
+/** Rangos de puntuación en orden ascendente (p. ej. Barthel 0–20, 21–60, 61–90, 91–99, 100). */
+export function scaleRanges(scale: Pick<ScaleDefinition, 'bands' | 'items'>): ScaleRange[] {
+  const min = minOf(scale.items);
+  const max = maxOf(scale.items);
+  const asc = [...scale.bands].sort((a, b) => a.min - b.min);
+  return asc.map((b, i) => ({
+    from: Math.max(b.min, min),
+    to: i < asc.length - 1 ? asc[i + 1]!.min - 1 : max,
+    interpretation: b.interpretation,
+    severity: b.severity,
+  }));
+}
 
 /** Devuelve el primer tramo cuyo mínimo se alcanza (los tramos van de mayor a menor). */
 export function band<T extends { min: number }>(score: number, bands: T[]): T {

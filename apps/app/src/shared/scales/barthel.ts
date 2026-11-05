@@ -1,4 +1,4 @@
-import { band, maxOf, sumAnswers, type ScaleDefinition, type ScaleItem } from './types';
+import { band, maxOf, sumAnswers, type ScaleDefinition, type ScaleItem, type Band } from './types';
 
 const items: ScaleItem[] = [
   { id: 'comer', text: 'Comer', options: [{ value: 10, label: 'Independiente: capaz de comer por sí solo en un tiempo razonable' }, { value: 5, label: 'Necesita ayuda para cortar la carne, untar la mantequilla, etc.' }, { value: 0, label: 'Dependiente' }] },
@@ -13,12 +13,12 @@ const items: ScaleItem[] = [
   { id: 'escaleras', text: 'Subir y bajar escaleras', options: [{ value: 10, label: 'Independiente: sube y baja un piso sin ayuda ni supervisión' }, { value: 5, label: 'Necesita ayuda física o supervisión' }, { value: 0, label: 'Dependiente: incapaz' }] },
 ];
 
-const BANDS = [
-  { min: 100, interpretation: 'Independiente', severity: 'normal' as const },
-  { min: 91, interpretation: 'Dependencia escasa', severity: 'mild' as const },
-  { min: 61, interpretation: 'Dependencia moderada', severity: 'moderate' as const },
-  { min: 21, interpretation: 'Dependencia severa', severity: 'severe' as const },
-  { min: 0, interpretation: 'Dependencia total', severity: 'severe' as const },
+const BANDS: Band[] = [
+  { min: 100, interpretation: 'Independiente', severity: 'normal' },
+  { min: 91, interpretation: 'Dependencia escasa', severity: 'mild' },
+  { min: 61, interpretation: 'Dependencia moderada', severity: 'moderate' },
+  { min: 21, interpretation: 'Dependencia severa', severity: 'severe' },
+  { min: 0, interpretation: 'Dependencia total', severity: 'severe' },
 ];
 
 export const barthel: ScaleDefinition = {
@@ -31,6 +31,7 @@ export const barthel: ScaleDefinition = {
   respondent: 'observacion',
   minutes: 5,
   higherIsBetter: true,
+  bands: BANDS,
   reference: 'Mahoney FI, Barthel DW. Md State Med J. 1965;14:61-5. Puntos de corte: Shah S, et al. J Clin Epidemiol. 1989;42:703-9.',
   items,
   score(answers) {

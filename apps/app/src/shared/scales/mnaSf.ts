@@ -1,4 +1,4 @@
-import { band, sumAnswers, type ScaleDefinition, type ScaleItem } from './types';
+import { band, sumAnswers, type ScaleDefinition, type ScaleItem, type Band } from './types';
 
 const items: ScaleItem[] = [
   { id: 'a', text: 'A. ¿Ha comido menos en los últimos 3 meses por falta de apetito, problemas digestivos o dificultad para masticar o tragar?', options: [{ value: 0, label: 'Disminución severa de la ingesta' }, { value: 1, label: 'Disminución moderada' }, { value: 2, label: 'Sin disminución' }] },
@@ -20,10 +20,10 @@ const items: ScaleItem[] = [
   },
 ];
 
-const BANDS = [
-  { min: 12, interpretation: 'Estado nutricional normal', severity: 'normal' as const },
-  { min: 8, interpretation: 'Riesgo de malnutrición', severity: 'moderate' as const },
-  { min: 0, interpretation: 'Malnutrición', severity: 'severe' as const },
+const BANDS: Band[] = [
+  { min: 12, interpretation: 'Estado nutricional normal', severity: 'normal' },
+  { min: 8, interpretation: 'Riesgo de malnutrición', severity: 'moderate' },
+  { min: 0, interpretation: 'Malnutrición', severity: 'severe' },
 ];
 
 export const mnaSf: ScaleDefinition = {
@@ -36,6 +36,7 @@ export const mnaSf: ScaleDefinition = {
   respondent: 'paciente',
   minutes: 4,
   higherIsBetter: true,
+  bands: BANDS,
   reference: 'Kaiser MJ, et al. J Nutr Health Aging. 2009;13:782-8. © Société des Produits Nestlé SA.',
   licensed: true,
   notice: 'MNA® es marca registrada de Société des Produits Nestlé S.A. Confirme las condiciones de uso antes de habilitarla.',

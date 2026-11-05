@@ -1,4 +1,4 @@
-import { band, sumAnswers, type ScaleDefinition, type ScaleItem, type ScaleOption } from './types';
+import { band, sumAnswers, type ScaleDefinition, type ScaleItem, type ScaleOption, type Band } from './types';
 
 /** "Sí" o "No" suma 1 punto según la dirección de cada pregunta. */
 const q = (id: string, text: string, depressiveAnswer: 'si' | 'no'): ScaleItem => {
@@ -27,11 +27,11 @@ const items: ScaleItem[] = [
   q('q15', '¿Cree que la mayoría de la gente está mejor que usted?', 'si'),
 ];
 
-const BANDS = [
-  { min: 12, interpretation: 'Síntomas depresivos severos', severity: 'severe' as const },
-  { min: 9, interpretation: 'Síntomas depresivos moderados', severity: 'moderate' as const },
-  { min: 5, interpretation: 'Síntomas depresivos leves (sugiere depresión)', severity: 'mild' as const },
-  { min: 0, interpretation: 'Normal', severity: 'normal' as const },
+const BANDS: Band[] = [
+  { min: 12, interpretation: 'Síntomas depresivos severos', severity: 'severe' },
+  { min: 9, interpretation: 'Síntomas depresivos moderados', severity: 'moderate' },
+  { min: 5, interpretation: 'Síntomas depresivos leves (sugiere depresión)', severity: 'mild' },
+  { min: 0, interpretation: 'Normal', severity: 'normal' },
 ];
 
 export const gds15: ScaleDefinition = {
@@ -44,6 +44,7 @@ export const gds15: ScaleDefinition = {
   respondent: 'paciente',
   minutes: 7,
   higherIsBetter: false,
+  bands: BANDS,
   reference: 'Sheikh JI, Yesavage JA. Clin Gerontol. 1986;5:165-73. Versión en español: Martínez de la Iglesia J, et al. Medifam. 2002;12:620-30.',
   notice: 'Pregunte por cómo se ha sentido durante la última semana. Es un tamizaje: un resultado alterado requiere valoración clínica.',
   items,

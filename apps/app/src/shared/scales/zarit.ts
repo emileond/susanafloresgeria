@@ -1,4 +1,4 @@
-import { band, sumAnswers, type ScaleDefinition, type ScaleItem } from './types';
+import { band, sumAnswers, type ScaleDefinition, type ScaleItem, type Band } from './types';
 
 const FREQ = [
   { value: 1, label: 'Nunca' },
@@ -35,10 +35,10 @@ const QUESTIONS = [
 
 const items: ScaleItem[] = QUESTIONS.map((text, i) => ({ id: `z${i + 1}`, text, options: FREQ }));
 
-const BANDS = [
-  { min: 56, interpretation: 'Sobrecarga intensa del cuidador', severity: 'severe' as const },
-  { min: 47, interpretation: 'Sobrecarga leve del cuidador', severity: 'moderate' as const },
-  { min: 0, interpretation: 'Sin sobrecarga', severity: 'normal' as const },
+const BANDS: Band[] = [
+  { min: 56, interpretation: 'Sobrecarga intensa del cuidador', severity: 'severe' },
+  { min: 47, interpretation: 'Sobrecarga leve del cuidador', severity: 'moderate' },
+  { min: 0, interpretation: 'Sin sobrecarga', severity: 'normal' },
 ];
 
 export const zarit: ScaleDefinition = {
@@ -51,6 +51,7 @@ export const zarit: ScaleDefinition = {
   respondent: 'cuidador',
   minutes: 10,
   higherIsBetter: false,
+  bands: BANDS,
   reference: 'Zarit SH, et al. Gerontologist. 1980;20:649-55. Versión en español y puntos de corte: Martín M, et al. Rev Gerontol. 1996;6:338-46.',
   licensed: true,
   notice: 'La Zarit Burden Interview tiene derechos de autor (Mapi Research Trust). Confirme la licencia antes de habilitarla.',
