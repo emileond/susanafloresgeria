@@ -1,0 +1,820 @@
+---
+import { Image } from 'astro:assets';
+import { getSortedPosts } from '../lib/blog';
+import Base from '../layouts/Base.astro';
+import WhatsAppIcon from '../components/WhatsAppIcon.astro';
+import DoctoraliaWidget from '../components/DoctoraliaWidget.astro';
+import PostCard from '../components/PostCard.astro';
+import Underline from '../components/Underline.astro';
+import Wave from '../components/Wave.astro';
+import Sparkle from '../components/Sparkle.astro';
+import { site, mapsUrl, mapsEmbedUrl } from '../config/site';
+import headshot from '../assets/headshot.png';
+
+import CalendarCheck from '@lucide/astro/icons/calendar-check';
+import Check from '@lucide/astro/icons/check';
+import Brain from '@lucide/astro/icons/brain';
+import Footprints from '@lucide/astro/icons/footprints';
+import Pill from '@lucide/astro/icons/pill';
+import HeartPulse from '@lucide/astro/icons/heart-pulse';
+import ClipboardList from '@lucide/astro/icons/clipboard-list';
+import HandHeart from '@lucide/astro/icons/hand-heart';
+import Stethoscope from '@lucide/astro/icons/stethoscope';
+import House from '@lucide/astro/icons/house';
+import Video from '@lucide/astro/icons/video';
+import GraduationCap from '@lucide/astro/icons/graduation-cap';
+import Hospital from '@lucide/astro/icons/hospital';
+import BadgeCheck from '@lucide/astro/icons/badge-check';
+import Languages from '@lucide/astro/icons/languages';
+import MapPin from '@lucide/astro/icons/map-pin';
+import Clock from '@lucide/astro/icons/clock';
+import Phone from '@lucide/astro/icons/phone';
+import Mail from '@lucide/astro/icons/mail';
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import Star from '@lucide/astro/icons/star';
+import ChevronDown from '@lucide/astro/icons/chevron-down';
+import Users from '@lucide/astro/icons/users';
+import X from '@lucide/astro/icons/x';
+import CreditCard from '@lucide/astro/icons/credit-card';
+import Lightbulb from '@lucide/astro/icons/lightbulb';
+import HeartHandshake from '@lucide/astro/icons/heart-handshake';
+
+const posts = (await getSortedPosts()).slice(0, 3);
+
+const mxn = (n: number) => `$${n.toLocaleString('es-MX')}`;
+
+
+// Qué aporta un geriatra, en lenguaje sencillo
+const pillars = [
+  {
+    icon: Users,
+    title: 'Ve a la persona completa',
+    desc: 'Revisa cuerpo, memoria, ánimo, movilidad, nutrición y entorno, no solo un órgano o una enfermedad.',
+  },
+  {
+    icon: Pill,
+    title: 'Pone orden en los tratamientos',
+    desc: 'Revisa juntos todos los medicamentos e indicaciones de los distintos especialistas para que no se contrapongan.',
+  },
+  {
+    icon: Footprints,
+    title: 'Protege su independencia',
+    desc: 'La meta no es solo controlar enfermedades: es que pueda caminar, comer, dormir, recordar y disfrutar su día.',
+  },
+  {
+    icon: HeartHandshake,
+    title: 'Incluye a la familia',
+    desc: 'Le explica con claridad qué pasa, qué esperar y cómo cuidar en casa, para que decida con información.',
+  },
+];
+
+const comparison = [
+  ['Un médico distinto para cada problema', 'Una visión de conjunto que coordina con los demás especialistas'],
+  ['Recetas de varios médicos que nadie revisa juntas', 'Todos los medicamentos revisados en conjunto'],
+  ['Se atiende la enfermedad cuando ya apareció', 'Se previenen caídas, olvidos y pérdida de movilidad'],
+  ['La familia se queda con dudas', 'La familia es parte del plan de cuidado'],
+];
+
+const whenToVisit = [
+  'Tiene 65 años o más y varias enfermedades crónicas',
+  'Toma 5 o más medicamentos',
+  'Ha cambiado su memoria, ánimo o comportamiento',
+  'Se ha caído o tiene miedo de caerse',
+  'Come menos, bajó de peso o se cansa más',
+  'Salió recientemente del hospital',
+  'Usted, como cuidador, se siente rebasado',
+];
+
+// Servicios redactados desde la preocupación de la familia, no desde el término médico.
+const concerns = [
+  {
+    icon: Brain,
+    worry: 'Olvida cosas o se desorienta',
+    signs: 'Repite preguntas, se pierde en lugares conocidos o le cuesta seguir una conversación.',
+    service: 'Memoria y demencias',
+    desc: 'Evaluación de la memoria, diagnóstico de deterioro cognitivo, Alzheimer y otras demencias, y orientación a la familia.',
+    post: 'como-apoyar-la-memoria-de-un-familiar',
+  },
+  {
+    icon: Footprints,
+    worry: 'Se ha caído o camina con miedo',
+    signs: 'Inseguridad al levantarse, necesita apoyo para caminar o ya tuvo una caída.',
+    service: 'Caídas y fragilidad',
+    desc: 'Detecto las causas, indico ejercicios y ajustes en casa para conservar la movilidad y la independencia.',
+    post: 'prevencion-de-caidas-en-adultos-mayores',
+  },
+  {
+    icon: Pill,
+    worry: 'Toma muchos medicamentos',
+    signs: 'Cinco o más pastillas al día, recetas de varios médicos, mareos o somnolencia.',
+    service: 'Revisión de medicamentos',
+    desc: 'Simplifico el tratamiento para evitar interacciones y efectos adversos (polifarmacia).',
+    post: 'polifarmacia-que-es-y-como-evitarla',
+  },
+  {
+    icon: HeartPulse,
+    worry: 'Tiene diabetes, presión alta u otra enfermedad crónica',
+    signs: 'Varias enfermedades a la vez que es difícil coordinar entre especialistas.',
+    service: 'Enfermedades crónicas',
+    desc: 'Control integral de diabetes, hipertensión, EPOC, insuficiencia cardíaca y otras condiciones frecuentes.',
+  },
+  {
+    icon: ClipboardList,
+    worry: '“Ya no es el mismo” y no sabe por qué',
+    signs: 'Cansancio, pérdida de peso o de apetito, ánimo bajo o cambios difíciles de explicar.',
+    service: 'Valoración geriátrica integral',
+    desc: 'Evaluación completa de lo físico, cognitivo, emocional y social para crear un plan de cuidados a su medida.',
+  },
+  {
+    icon: HandHeart,
+    worry: 'Tiene una enfermedad avanzada',
+    signs: 'Busca que esté cómodo, sin dolor y acompañado, idealmente en casa.',
+    service: 'Cuidados paliativos',
+    desc: 'Atención centrada en el confort y la dignidad, en consultorio o a domicilio, con apoyo a la familia.',
+  },
+];
+
+const modalities = [
+  {
+    icon: Stethoscope,
+    title: 'En consultorio',
+    desc: `${site.address.neighborhood}, León. Primera consulta con valoración completa.`,
+    price: mxn(site.pricing.clinic),
+  },
+  {
+    icon: House,
+    title: 'A domicilio',
+    desc: 'Si a su familiar le cuesta trasladarse o está en cama. Incluye cuidados paliativos en casa.',
+    price: mxn(site.pricing.home),
+  },
+  {
+    icon: Video,
+    title: 'En línea',
+    desc: 'Para seguimiento, o si usted vive en otra ciudad o en el extranjero. Con receta electrónica.',
+    price: `$${site.pricing.online}`,
+  },
+];
+
+const steps = [
+  {
+    title: 'Agende su cita',
+    desc: 'En línea a cualquier hora con Doctoralia, por WhatsApp o por teléfono. Puede agendarla usted en nombre de su familiar.',
+  },
+  {
+    title: 'Venga acompañado',
+    desc: 'Traiga la lista de medicamentos y estudios recientes. La información que aporta la familia es clave para la valoración.',
+  },
+  {
+    title: 'Reciba un plan claro',
+    desc: 'Le explico con detalle el diagnóstico y lo que sigue, con un plan de cuidados personalizado y seguimiento.',
+  },
+];
+
+const checklist = [
+  'Identificación del paciente',
+  'Todos los medicamentos que toma (o las cajas), incluidas vitaminas, suplementos y remedios',
+  'Estudios de laboratorio o de imagen recientes',
+  'Diagnósticos previos y nombres de otros médicos tratantes',
+  'Sus dudas por escrito, para no olvidar ninguna',
+];
+
+// TODO: reemplazar por testimonios reales (con permiso de las familias) o por citas de las opiniones de Doctoralia.
+const testimonials = [
+  {
+    name: 'María G.',
+    relation: 'Hija de paciente',
+    text: 'La doctora Susana fue muy clara y amable. Mi mamá mejoró su movilidad y ahora se siente más segura.',
+  },
+  {
+    name: 'Jorge P.',
+    relation: 'Hijo de paciente',
+    text: 'Excelente atención y seguimiento. Nos ayudó a entender el diagnóstico de Alzheimer y cómo cuidarlo en casa.',
+  },
+  {
+    name: 'Lucía R.',
+    relation: 'Nieta de paciente',
+    text: 'Muy profesional. Ajustó los medicamentos de mi abuelo y disminuyeron los mareos y caídas.',
+  },
+];
+
+const faqs = [
+  {
+    q: '¿A partir de qué edad conviene ver a un geriatra?',
+    a: 'Generalmente a partir de los 65 años, sobre todo si hay varias enfermedades, muchos medicamentos o cambios en la memoria, el ánimo o la movilidad. No hace falta esperar a que haya un problema grave: una valoración a tiempo ayuda a prevenir.',
+  },
+  {
+    q: '¿El geriatra reemplaza a los otros médicos de mi familiar?',
+    a: 'No necesariamente. El geriatra ve el panorama completo y coordina con los demás especialistas (cardiólogo, neurólogo, etc.), revisando que tratamientos e indicaciones funcionen bien juntos. En muchos casos se convierte en el médico de cabecera de la persona mayor.',
+  },
+  {
+    q: '¿Puedo agendar la cita en nombre de mi familiar?',
+    a: 'Sí. La mayoría de las citas las agenda un hijo, hija o cuidador. Al reservar, indique el nombre del paciente y un teléfono de contacto.',
+  },
+  {
+    q: '¿Puedo acompañar a mi familiar a la consulta?',
+    a: 'Sí, y se lo recomiendo. La información que aporta la familia es muy valiosa para la valoración, y así usted también resuelve sus dudas sobre los cuidados en casa.',
+  },
+  {
+    q: '¿Atiende a domicilio?',
+    a: `Sí. Realizo visitas a domicilio en León para personas mayores a las que se les dificulta trasladarse, incluidos cuidados paliativos en casa. El costo de referencia es de ${mxn(site.pricing.home)}. Consulte disponibilidad para su zona.`,
+  },
+  {
+    q: 'Vivo en otra ciudad, ¿puedo tener una consulta en línea?',
+    a: 'Sí. La consulta en línea funciona muy bien para seguimiento y para familias que viven lejos, e incluye receta electrónica. Para una primera valoración completa puede recomendarse una visita presencial.',
+  },
+  {
+    q: '¿Cuánto cuesta la consulta?',
+    a: `Consulta de primera vez en consultorio: ${mxn(site.pricing.clinic)}. A domicilio: ${mxn(site.pricing.home)}. En línea: $${site.pricing.online}. Formas de pago: ${site.payments.toLowerCase()}`,
+  },
+  {
+    q: '¿Acepta seguros de gastos médicos?',
+    a: 'No trabajo directamente con aseguradoras, pero entrego factura para que pueda solicitar el reembolso a su aseguradora.',
+  },
+  {
+    q: '¿Qué debo llevar a la primera consulta?',
+    a: 'Identificación, la lista de todos los medicamentos (o las cajas), estudios recientes y diagnósticos previos. Si es posible, venga con el familiar o cuidador que más convive con el paciente.',
+  },
+];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+// Un solo tono de marca para íconos y acentos (paleta sobria)
+const tones = [{ bg: 'bg-brand-50', fg: 'text-brand-700', dot: 'bg-brand-500' }];
+const tone = (i: number) => tones[i % tones.length];
+
+const quickTopics = ['Memoria', 'Caídas', 'Medicamentos', 'Enfermedades crónicas', 'Chequeo completo', 'Cuidados paliativos'];
+---
+
+<Base jsonLd={[faqSchema]}>
+  <!-- ============ HERO ============ -->
+  <div class="pt-2.5 sm:pt-4">
+    <section class="panel relative bg-brand-50">
+      <div aria-hidden="true" class="pointer-events-none absolute right-[-6rem] bottom-[-7rem] size-80 rounded-full bg-brand-100/80"></div>
+
+      <div class="container-page relative grid items-center gap-12 py-12 sm:py-16 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10 lg:py-20">
+        <div>
+          <p class="eyebrow">Geriatra en León, Guanajuato</p>
+          <h1 class="mt-5 text-[2.4rem] leading-[1.1] sm:text-5xl lg:text-[3.6rem]">
+            Atención experta y cálida para su familiar mayor, y orientación clara para <Underline>usted</Underline>.
+          </h1>
+          <p class="mt-6 max-w-xl text-lg text-ink/75 sm:text-xl">
+            Si le preocupan la memoria, las caídas o los medicamentos de su mamá, papá o abuelos, le ayudo a entender qué
+            está pasando y a crear, junto con usted, un plan de cuidado claro.
+          </p>
+
+          <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+            <a href="#agendar" class="btn btn-primary">
+              <CalendarCheck aria-hidden="true" />
+              Agendar cita
+            </a>
+            <a href={site.whatsapp.href} target="_blank" rel="noopener" class="btn btn-whatsapp">
+              <WhatsAppIcon />
+              Escribir por WhatsApp
+            </a>
+          </div>
+
+          <div class="mt-10">
+            <p class="text-base font-semibold text-ink/70">Busco ayuda con:</p>
+            <ul class="mt-3 flex flex-wrap gap-2">
+              {
+                quickTopics.map((t, i) => (
+                  <li>
+                    <a
+                      href={`#servicio-${i}`}
+                      class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-base font-semibold text-ink transition-colors hover:bg-brand-50"
+                    >
+                      <span class={`size-2.5 rounded-full ${tone(i).dot}`} aria-hidden="true"></span>
+                      {t}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
+
+        <div class="relative mx-auto w-full max-w-[22rem] sm:max-w-[25rem]">
+          <div aria-hidden="true" class="absolute -top-6 -right-8 size-28 rounded-full bg-accent sm:size-32"></div>
+          <div aria-hidden="true" class="absolute bottom-16 -left-10 size-20 rounded-full bg-brand-200/80"></div>
+          <Sparkle class="absolute -top-10 left-2 size-10 text-ink" />
+          <div class="arch relative overflow-hidden bg-brand-200">
+            <Image
+              src={headshot}
+              alt="Dra. Susana Flores Alonso, geriatra en León"
+              widths={[400, 611]}
+              sizes="(min-width: 1024px) 400px, 90vw"
+              loading="eager"
+              fetchpriority="high"
+              class="aspect-[4/5] w-full object-cover object-top"
+            />
+          </div>
+          <div class="absolute -bottom-5 left-1/2 flex w-max -translate-x-1/2 items-center gap-3 rounded-full bg-white py-2.5 pr-5 pl-2.5">
+            <span class="inline-flex size-10 items-center justify-center rounded-full bg-brand-50 text-brand-700">
+              <BadgeCheck class="size-5" aria-hidden="true" />
+            </span>
+            <span class="leading-tight">
+              <span class="block text-base font-bold">Especialista en Geriatría</span>
+              <span class="block text-sm text-muted">Universidad Autónoma de Yucatán</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ CONFIANZA ============ -->
+  <section aria-label="Credenciales">
+    <ul class="container-page grid gap-6 py-10 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        [
+          { icon: GraduationCap, title: 'Especialidad en Geriatría', text: 'Universidad Autónoma de Yucatán' },
+          { icon: BadgeCheck, title: 'Cédulas profesionales', text: site.credentials.cedulas.join(' · ') },
+          { icon: Star, title: 'Lo más valorado por pacientes', text: 'Puntualidad y explicaciones detalladas', href: site.doctoralia.reviewsUrl },
+          { icon: Languages, title: 'Español e inglés', text: 'Presencial, a domicilio o en línea' },
+        ].map((item, i) => (
+          <li class="flex items-center gap-4">
+            <span class={`inline-flex size-12 shrink-0 items-center justify-center rounded-full ${tone(i).bg} ${tone(i).fg}`}>
+              <item.icon class="size-6" aria-hidden="true" />
+            </span>
+            <span class="text-base leading-snug">
+              <strong class="block font-semibold">{item.title}</strong>
+              {item.href ? (
+                <a href={item.href} target="_blank" rel="noopener" class="text-muted underline decoration-ink/20 underline-offset-4 hover:text-brand-700">
+                  {item.text}
+                </a>
+              ) : (
+                <span class="text-muted">{item.text}</span>
+              )}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <!-- ============ ¿QUÉ ES UN GERIATRA? ============ -->
+  <section id="geriatria" class="pt-10 pb-16 sm:pt-16 sm:pb-24">
+    <div class="container-page">
+      <div class="grid items-end gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+        <div>
+          <p class="eyebrow">¿Qué es la geriatría?</p>
+          <h2 class="section-title mt-4">
+            Más que tratar enfermedades: ayudar a su familiar a <Underline>vivir mejor</Underline>.
+          </h2>
+        </div>
+        <p class="text-lg text-muted">
+          Así como el pediatra se especializa en los niños, el geriatra se especializa en las personas mayores. Con la
+          edad, el cuerpo cambia: las enfermedades se manifiestan distinto, los medicamentos actúan diferente y varios
+          problemas suelen aparecer al mismo tiempo. El geriatra está formado para ver todo eso en conjunto.
+        </p>
+      </div>
+
+      <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          pillars.map((p, i) => (
+            <div class="flex flex-col rounded-[1.75rem] bg-mist p-6 sm:p-7">
+              <span class="icon-bubble text-brand-700">
+                <p.icon aria-hidden="true" />
+              </span>
+              <h3 class="mt-6 text-xl leading-snug">{p.title}</h3>
+              <p class="mt-2 text-base text-ink/75">{p.desc}</p>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="mt-4 flex flex-col gap-4 rounded-[1.75rem] bg-brand-50 p-6 sm:flex-row sm:items-center sm:gap-6 sm:p-8">
+        <span class="icon-bubble text-brand-700">
+          <Lightbulb aria-hidden="true" />
+        </span>
+        <p class="text-lg">
+          <strong>No es solo para personas “muy mayores” o muy enfermas.</strong>{' '}
+          <span class="text-ink/75">
+            Consultar a tiempo ayuda a prevenir caídas, olvidos y pérdida de movilidad, para que su familiar conserve su
+            independencia el mayor tiempo posible.
+          </span>
+        </p>
+      </div>
+
+      <div class="mt-14 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+        <div class="card-white self-start !p-0 overflow-hidden">
+          <div class="grid grid-cols-2 text-sm font-bold sm:text-base">
+            <p class="p-4 text-muted sm:px-6 sm:py-5">Sin una visión geriátrica</p>
+            <p class="flex items-center gap-2 bg-brand-50 p-4 text-brand-700 sm:px-6 sm:py-5">
+              <img src="/logo-mark.svg" alt="" width="22" height="22" class="size-5.5" /> Con un geriatra
+            </p>
+          </div>
+          <ul>
+            {
+              comparison.map(([before, after]) => (
+                <li class="grid grid-cols-2 border-t border-line">
+                  <p class="flex gap-2.5 p-4 text-base text-muted sm:px-6 sm:py-5">
+                    <X class="mt-1 size-4 shrink-0 text-ink/30" aria-hidden="true" />
+                    {before}
+                  </p>
+                  <p class="flex gap-2.5 bg-brand-50/60 p-4 text-base font-medium sm:px-6 sm:py-5">
+                    <Check class="mt-1 size-4 shrink-0 text-brand-700" stroke-width={3} aria-hidden="true" />
+                    {after}
+                  </p>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <aside class="flex flex-col rounded-[1.75rem] bg-mist p-6 sm:p-8" aria-labelledby="cuando-title">
+          <h3 id="cuando-title" class="text-2xl">¿Cuándo conviene consultar a un geriatra?</h3>
+          <ul class="mt-5 space-y-3">
+            {
+              whenToVisit.map((item) => (
+                <li class="flex gap-3 text-base">
+                  <span class="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-white text-brand-700">
+                    <Check class="size-4" stroke-width={3} aria-hidden="true" />
+                  </span>
+                  {item}
+                </li>
+              ))
+            }
+          </ul>
+          <p class="mt-6 text-base text-ink/75">Si reconoce una o más de estas situaciones, una valoración geriátrica puede ayudar.</p>
+          <a href="#agendar" class="btn btn-dark mt-5 w-full">
+            <CalendarCheck aria-hidden="true" />
+            Agendar valoración
+          </a>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SERVICIOS ============ -->
+  <Wave fill="var(--color-mist)" />
+  <section id="servicios" class="bg-mist py-16 sm:py-20">
+    <div class="container-page">
+      <div class="max-w-2xl">
+        <p class="eyebrow">Servicios</p>
+        <h2 class="section-title mt-4">¿Qué le preocupa de su familiar?</h2>
+        <p class="mt-4 text-lg text-muted">
+          Las familias suelen llegar con alguna de estas inquietudes. Cada una se puede evaluar y atender, y usted no
+          tiene que enfrentarla sin apoyo.
+        </p>
+      </div>
+
+      <div class="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {
+          concerns.map((c, i) => (
+            <article id={`servicio-${i}`} class="flex scroll-mt-28 flex-col rounded-[1.75rem] bg-white p-6 sm:p-7">
+              <span class={`inline-flex size-14 items-center justify-center rounded-full ${tone(i).bg} ${tone(i).fg}`}>
+                <c.icon class="size-7" aria-hidden="true" />
+              </span>
+              <h3 class="mt-5 text-[1.4rem] leading-snug">{c.worry}</h3>
+              <p class="mt-2 text-base text-muted">{c.signs}</p>
+              <div class="mt-5 rounded-2xl bg-mist p-4">
+                <p class={`text-sm font-bold ${tone(i).fg}`}>{c.service}</p>
+                <p class="mt-1 text-base text-ink/85">{c.desc}</p>
+              </div>
+              {c.post && (
+                <a href={`/blog/${c.post}/`} class="mt-auto inline-flex items-center gap-1.5 pt-5 text-base font-semibold text-ink hover:text-brand-700">
+                  Leer guía para familias
+                  <ArrowRight class="size-4" aria-hidden="true" />
+                </a>
+              )}
+            </article>
+          ))
+        }
+      </div>
+
+      <div class="mt-4 flex flex-col items-start justify-between gap-5 rounded-[1.75rem] border border-line bg-white p-6 sm:flex-row sm:items-center sm:p-8">
+        <div>
+          <p class="text-xl font-bold sm:text-2xl">¿No sabe qué tipo de consulta necesita?</p>
+          <p class="mt-1 text-base text-ink/75">Escríbame, cuénteme brevemente la situación y le oriento.</p>
+        </div>
+        <a href={site.whatsapp.href} target="_blank" rel="noopener" class="btn btn-whatsapp w-full sm:w-auto">
+          <WhatsAppIcon />
+          Preguntar por WhatsApp
+        </a>
+      </div>
+    </div>
+  </section>
+  <Wave fill="var(--color-mist)" flip />
+
+  <!-- ============ MODALIDADES ============ -->
+  <section id="modalidades" class="py-16 sm:py-24">
+    <div class="container-page">
+      <div class="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+        <div class="max-w-2xl">
+          <p class="eyebrow">Modalidades y costos</p>
+          <h2 class="section-title mt-4">Elija la consulta que mejor le acomode</h2>
+        </div>
+        <p class="text-base text-muted">Costos de referencia; se confirman al agendar.</p>
+      </div>
+
+      <div class="mt-10 grid gap-4 md:grid-cols-3">
+        {
+          modalities.map((m) => (
+            <div class="flex flex-col rounded-[1.75rem] bg-mist p-7">
+              <span class="icon-bubble text-brand-700">
+                <m.icon aria-hidden="true" />
+              </span>
+              <h3 class="mt-6 text-2xl">{m.title}</h3>
+              <p class="mt-2 flex-1 text-base text-ink/75">{m.desc}</p>
+              <p class="mt-6 rounded-2xl bg-white/70 px-5 py-4">
+                <span class="block text-3xl font-bold">
+                  {m.price} <span class="text-base font-semibold text-muted">MXN</span>
+                </span>
+              </p>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="mt-4 flex flex-col gap-4 rounded-[1.75rem] border border-line bg-white p-6 sm:flex-row sm:items-center sm:justify-between sm:p-7">
+        <p class="flex items-start gap-3 text-base text-muted">
+          <CreditCard class="mt-0.5 size-5 shrink-0 text-ink/60" aria-hidden="true" />
+          Formas de pago: {site.payments.toLowerCase()} Factura disponible para reembolso de su seguro.
+        </p>
+        <a href="#agendar" class="btn btn-primary w-full sm:w-auto">
+          <CalendarCheck aria-hidden="true" />
+          Ver horarios disponibles
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CÓMO FUNCIONA ============ -->
+  <section id="como-funciona" class="panel bg-mist">
+    <div class="container-page grid gap-12 py-16 sm:py-20 lg:grid-cols-[1.2fr_0.8fr] lg:gap-16">
+      <div>
+        <p class="eyebrow">Cómo funciona</p>
+        <h2 class="section-title mt-4">Su primera consulta, paso a paso</h2>
+        <ol class="relative mt-10 space-y-8">
+          {
+            steps.map((s, i) => (
+              <li class="flex gap-5">
+                <span class={`inline-flex size-14 shrink-0 items-center justify-center rounded-full text-2xl font-bold ${tone(i).bg} ${tone(i).fg}`}>
+                  {i + 1}
+                </span>
+                <div class="pt-2">
+                  <h3 class="text-xl sm:text-2xl">{s.title}</h3>
+                  <p class="mt-1 text-lg text-muted">{s.desc}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+
+      <aside class="self-start rounded-[1.75rem] bg-white p-6 sm:p-8" aria-labelledby="checklist-title">
+        <span class="icon-bubble !bg-brand-50 text-brand-700">
+          <ClipboardList aria-hidden="true" />
+        </span>
+        <h3 id="checklist-title" class="mt-5 text-xl sm:text-2xl">Qué llevar a la primera consulta</h3>
+        <ul class="mt-5 space-y-3">
+          {
+            checklist.map((item) => (
+              <li class="flex gap-3 text-base">
+                <span class="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-700">
+                  <Check class="size-4" stroke-width={3} aria-hidden="true" />
+                </span>
+                {item}
+              </li>
+            ))
+          }
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ SOBRE LA DOCTORA ============ -->
+  <section id="sobre-mi" class="py-16 sm:py-24">
+    <div class="container-page grid items-center gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+      <div class="relative mx-auto w-full max-w-[20rem] sm:max-w-sm">
+        <div aria-hidden="true" class="absolute -bottom-6 -left-6 size-32 rounded-full bg-brand-100"></div>
+        <div aria-hidden="true" class="absolute top-10 -right-6 size-16 rounded-full bg-accent"></div>
+        <div class="arch relative overflow-hidden bg-brand-100">
+          <Image
+            src={headshot}
+            alt="Retrato de la Dra. Susana Flores Alonso"
+            widths={[400, 611]}
+            sizes="(min-width: 1024px) 380px, 90vw"
+            class="aspect-[4/5] w-full object-cover object-top"
+          />
+        </div>
+      </div>
+
+      <div>
+        <p class="eyebrow">Sobre la doctora</p>
+        <h2 class="section-title mt-4">Hola, soy la Dra. Susana Flores Alonso</h2>
+        <div class="mt-6 space-y-4 text-lg text-ink/80">
+          <p>
+            Soy médica geriatra. Me dedico a atender a las personas mayores con un enfoque integral: deterioro cognitivo y
+            demencias, fragilidad, caídas, exceso de medicamentos, enfermedades crónicas y cuidados paliativos.
+          </p>
+          <p>
+            Trabajo de la mano con la familia y los cuidadores, porque ustedes son parte esencial del cuidado. Mi
+            compromiso es explicarles con claridad cada paso y diseñar planes personalizados que promuevan la autonomía,
+            la seguridad y el bienestar de su ser querido.
+          </p>
+        </div>
+
+        <dl class="mt-10 grid gap-x-6 gap-y-7 sm:grid-cols-2">
+          {
+            [
+              { icon: GraduationCap, term: 'Formación', items: site.credentials.education.map((e) => `${e.title}, ${e.school}`) },
+              { icon: Hospital, term: 'Experiencia hospitalaria', items: [...site.credentials.hospitals] },
+              { icon: BadgeCheck, term: 'Cédulas profesionales', items: [site.credentials.cedulas.join(' y ')] },
+              { icon: Users, term: 'Enfoque', items: ['Demencias, envejecimiento y cuidados paliativos'] },
+            ].map((d, i) => (
+              <div class="flex gap-4">
+                <span class={`inline-flex size-11 shrink-0 items-center justify-center rounded-full ${tone(i).bg} ${tone(i).fg}`}>
+                  <d.icon class="size-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <dt class="font-bold">{d.term}</dt>
+                  {d.items.map((t) => <dd class="mt-1 text-base text-muted">{t}</dd>)}
+                </div>
+              </div>
+            ))
+          }
+        </dl>
+
+        <a href="#agendar" class="btn btn-primary mt-10">
+          <CalendarCheck aria-hidden="true" />
+          Agendar una cita con la doctora
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TESTIMONIOS ============ -->
+  <section id="testimonios" class="panel relative bg-mist">
+    <div class="container-page relative py-16 sm:py-20">
+      <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div class="max-w-2xl">
+          <p class="eyebrow">Testimonios</p>
+          <h2 class="section-title mt-4">Lo que dicen las familias</h2>
+        </div>
+        <a href={site.doctoralia.reviewsUrl} target="_blank" rel="noopener" class="link text-base">Ver opiniones en Doctoralia</a>
+      </div>
+
+      <div class="mt-10 grid gap-4 md:grid-cols-3">
+        {
+          testimonials.map((t, i) => (
+            <figure class="flex flex-col rounded-[1.75rem] bg-white p-7">
+              <span class="font-display text-6xl leading-none font-bold text-brand-300" aria-hidden="true">
+                “
+              </span>
+              <blockquote class="mt-2 flex-1 text-xl leading-relaxed">{t.text}</blockquote>
+              <figcaption class="mt-6 flex items-center gap-3 text-base">
+                <span class="inline-flex size-10 items-center justify-center rounded-full bg-brand-50 font-bold text-brand-700" aria-hidden="true">
+                  {t.name.charAt(0)}
+                </span>
+                <span>
+                  <strong class="block">{t.name}</strong>
+                  <span class="text-muted">{t.relation}</span>
+                </span>
+              </figcaption>
+            </figure>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RECURSOS / BLOG ============ -->
+  <section id="recursos" class="py-16 sm:py-24">
+    <div class="container-page">
+      <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div class="max-w-2xl">
+          <p class="eyebrow">Recursos para cuidadores</p>
+          <h2 class="section-title mt-4">Guías prácticas para cuidar mejor en casa</h2>
+        </div>
+        <a href="/blog/" class="link text-base">Ver todos los artículos</a>
+      </div>
+      <div class="mt-10 grid gap-4 md:grid-cols-3">
+        {posts.map((p, i) => <PostCard post={p} index={i} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PREGUNTAS FRECUENTES ============ -->
+  <section id="preguntas" class="pb-16 sm:pb-24">
+    <div class="container-page grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+      <div class="lg:sticky lg:top-28 lg:self-start">
+        <p class="eyebrow">Preguntas frecuentes</p>
+        <h2 class="section-title mt-4">Resolvemos sus dudas</h2>
+        <p class="mt-4 text-lg text-muted">¿Tiene otra pregunta? Con gusto le respondo.</p>
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
+          <a href={site.whatsapp.href} target="_blank" rel="noopener" class="btn btn-whatsapp">
+            <WhatsAppIcon />
+            WhatsApp
+          </a>
+          <a href={site.phone.href} class="btn btn-outline">
+            <Phone aria-hidden="true" />
+            Llamar
+          </a>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        {
+          faqs.map((f) => (
+            <details class="group rounded-[1.5rem] bg-mist px-6 transition-colors open:bg-brand-50 sm:px-7">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-lg font-bold sm:text-xl [&::-webkit-details-marker]:hidden">
+                {f.q}
+                <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-white">
+                  <ChevronDown class="size-5 transition-transform group-open:rotate-180" aria-hidden="true" />
+                </span>
+              </summary>
+              <p class="pb-6 text-lg text-ink/75">{f.a}</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AGENDAR ============ -->
+  <section id="agendar" class="panel relative mb-2.5 bg-brand-50 sm:mb-4">
+    <div aria-hidden="true" class="pointer-events-none absolute -bottom-24 -left-20 size-72 rounded-full bg-brand-100/70"></div>
+        <div class="container-page relative py-16 sm:py-20">
+      <div class="mx-auto max-w-2xl text-center">
+        <p class="eyebrow">Agendar cita</p>
+        <h2 class="section-title mt-4">Dé el primer <Underline>paso</Underline> hoy</h2>
+        <p class="mt-4 text-lg text-ink/75">
+          Elija el horario que le convenga en el calendario o, si lo prefiere, escríbame o llámeme y con gusto le ayudo a
+          agendar.
+        </p>
+      </div>
+
+      <div class="mt-12 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+        <div class="rounded-[1.75rem] bg-white p-6 sm:p-8">
+          <h3 class="flex items-center gap-3 text-xl">
+            <span class="inline-flex size-10 items-center justify-center rounded-full bg-brand-50 text-brand-700">
+              <CalendarCheck class="size-5" aria-hidden="true" />
+            </span>
+            Reserve en línea, a cualquier hora
+          </h3>
+          <p class="mt-2 text-base text-muted">Elija el día y la hora que mejor le acomoden. El calendario muestra la disponibilidad real.</p>
+          <div class="mt-5">
+            <DoctoraliaWidget />
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <div class="rounded-[1.75rem] bg-white p-6 sm:p-8">
+            <h3 class="text-xl">¿Prefiere hablar con nosotros?</h3>
+            <div class="mt-5 grid gap-3">
+              <a href={site.whatsapp.href} target="_blank" rel="noopener" class="btn btn-whatsapp w-full">
+                <WhatsAppIcon />
+                Escribir por WhatsApp
+              </a>
+              <a href={site.phone.href} class="btn btn-outline w-full">
+                <Phone aria-hidden="true" />
+                Llamar al {site.phone.display}
+              </a>
+              <a href={`mailto:${site.email}`} class="inline-flex items-center justify-center gap-2 py-2 text-base font-semibold text-ink hover:text-brand-700">
+                <Mail class="size-5" aria-hidden="true" />
+                {site.email}
+              </a>
+            </div>
+          </div>
+
+          <div class="overflow-hidden rounded-[1.75rem] bg-white">
+            <iframe
+              title="Mapa de ubicación del consultorio"
+              src={mapsEmbedUrl}
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              class="h-48 w-full border-0"></iframe>
+            <div class="space-y-4 p-6 sm:p-7">
+              <div class="flex gap-3">
+                <MapPin class="mt-1 size-6 shrink-0 text-brand-700" aria-hidden="true" />
+                <div>
+                  <p class="font-bold">{site.address.clinic}</p>
+                  <address class="text-base text-muted not-italic">
+                    {site.address.street}, {site.address.neighborhood}<br />
+                    {site.address.zip} {site.address.city}, {site.address.stateShort}
+                  </address>
+                  <a href={mapsUrl} target="_blank" rel="noopener" class="link mt-1 inline-block text-base">Cómo llegar</a>
+                </div>
+              </div>
+              <div class="flex gap-3">
+                <Clock class="mt-1 size-6 shrink-0 text-brand-700" aria-hidden="true" />
+                <ul class="text-base">
+                  {site.hours.map((h) => <li><strong>{h.days}:</strong> <span class="text-muted">{h.time}</span></li>)}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

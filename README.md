@@ -1,27 +1,30 @@
-# React + Vite
+# Sitio web — Dra. Susana Flores Alonso, Geriatra en León
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Sitio estático construido con [Astro](https://astro.build) + Tailwind CSS. Genera HTML puro (sin depender de JavaScript para mostrar el contenido), lo que lo hace rápido en celulares y fácil de indexar por Google.
 
-Currently, two official plugins are available:
+## Comandos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+| Comando           | Acción                                          |
+| ----------------- | ----------------------------------------------- |
+| `npm install`     | Instala dependencias                            |
+| `npm run dev`     | Servidor de desarrollo en `http://localhost:4321` |
+| `npm run build`   | Genera el sitio final en `dist/`                |
+| `npm run preview` | Sirve localmente la carpeta `dist/`             |
+| `npm run check`   | Revisa errores de tipos y plantillas            |
 
-## React Compiler
+`dist/` se puede publicar en cualquier hosting estático (Cloudflare Pages, Netlify, Vercel, GitHub Pages…).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Dónde cambiar las cosas
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-
+- **Teléfono, WhatsApp, correo, dirección, horarios, precios y cédulas:** `src/config/site.ts`. Todo el sitio toma los datos de ahí.
+- **Textos de la página principal** (servicios, pasos, testimonios, preguntas frecuentes): `src/pages/index.astro`. Cada sección está separada con un comentario.
+- **Colores y tipografías:** `src/styles/global.css`.
+- **Foto:** `src/assets/headshot.png`. Astro la optimiza automáticamente (WebP, varios tamaños).
+- **Imagen para compartir en WhatsApp/Facebook:** `public/og-image.jpg` (1200×630).
 
 ## Blog en Markdown
 
-Para facilitar el mantenimiento por personas no técnicas, los artículos del blog se escriben en archivos Markdown con frontmatter.
-
-- Carpeta de posts: `src/content/blog/`
-- Formato de archivo (`.md`) con frontmatter YAML:
+Los artículos se escriben en archivos Markdown con frontmatter en `src/content/blog/`:
 
 ```
 ---
@@ -34,15 +37,7 @@ excerpt: "Resumen corto para la tarjeta del blog."
 Contenido en Markdown...
 ```
 
-- La lista de artículos y las páginas de detalle se generan automáticamente:
-  - Listado: `/blog`
-  - Detalle: `/blog/{slug}`
-
-### Agregar un nuevo artículo
-1. Cree un archivo `.md` en `src/content/blog/` siguiendo el formato anterior.
-2. Use un `slug` en minúsculas, con guiones y sin acentos.
-3. Guarde el archivo. El sitio lo detectará automáticamente durante el build/servidor de desarrollo.
-
-### Notas
-- La fecha se muestra con formato local `es-MX`.
-- El contenido Markdown soporta listas, encabezados, tablas y enlaces (GFM).
+- Listado: `/blog/` · Detalle: `/blog/{slug}/`
+- Use un `slug` en minúsculas, con guiones y sin acentos.
+- Cada artículo muestra automáticamente un bloque para agendar cita y artículos relacionados.
+- El contenido soporta listas, encabezados, tablas y enlaces (GFM).

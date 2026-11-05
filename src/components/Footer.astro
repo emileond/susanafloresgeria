@@ -1,0 +1,67 @@
+---
+import { site, nav, mapsUrl } from '../config/site';
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-2.5 bg-ink text-white/80 sm:mt-4">
+  <div class="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="lg:col-span-1">
+      <div class="flex items-center gap-3">
+        <span class="inline-flex size-12 items-center justify-center rounded-full bg-white">
+          <img src="/logo-mark.svg" alt="" width="40" height="40" class="size-10" loading="lazy" />
+        </span>
+        <span class="text-xl font-bold text-white">{site.shortName}</span>
+      </div>
+      <p class="mt-4 text-base text-white/60">{site.tagline}. Atención integral para personas mayores y orientación para sus familias.</p>
+    </div>
+
+    <div>
+      <h2 class="text-base font-bold text-white">Consultorio</h2>
+      <address class="mt-4 text-base not-italic">
+        {site.address.street}<br />
+        {site.address.neighborhood}<br />
+        {site.address.zip} {site.address.city}, {site.address.stateShort}
+      </address>
+      <a href={mapsUrl} target="_blank" rel="noopener" class="mt-2 inline-block text-base font-bold text-white underline underline-offset-4">
+        Cómo llegar
+      </a>
+    </div>
+
+    <div>
+      <h2 class="text-base font-bold text-white">Contacto</h2>
+      <ul class="mt-4 space-y-2 text-base">
+        <li><a class="hover:text-white hover:underline" href={site.phone.href}>Tel. {site.phone.display}</a></li>
+        <li><a class="hover:text-white hover:underline" href={site.whatsapp.href} target="_blank" rel="noopener">WhatsApp</a></li>
+        <li><a class="hover:text-white hover:underline" href={`mailto:${site.email}`}>{site.email}</a></li>
+      </ul>
+      <ul class="mt-4 space-y-1 text-base text-white/60">
+        {site.hours.map((h) => <li>{h.days}: {h.time}</li>)}
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="text-base font-bold text-white">Sitio</h2>
+      <ul class="mt-4 space-y-2 text-base">
+        {
+          nav.map((item) => (
+            <li>
+              <a class="hover:text-white hover:underline" href={item.href}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+        <li><a class="hover:text-white hover:underline" href="/#agendar">Agendar cita</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="border-t border-white/10">
+    <div class="container-page flex flex-col gap-2 py-6 text-sm text-white/60 sm:flex-row sm:items-center sm:justify-between">
+      <p>
+        {site.name} · {site.specialty} · Cédulas profesionales {site.credentials.cedulas.join(' y ')}
+      </p>
+      <p>© {year} · La información de este sitio no sustituye una consulta médica.</p>
+    </div>
+  </div>
+</footer>

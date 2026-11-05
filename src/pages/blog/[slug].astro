@@ -1,0 +1,81 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PostCard from '../../components/PostCard.astro';
+import BookingCTA from '../../components/BookingCTA.astro';
+import { getSortedPosts, formatDate, readingTime } from '../../lib/blog';
+import { site } from '../../config/site';
+import ArrowLeft from '@lucide/astro/icons/arrow-left';
+
+export async function getStaticPaths() {
+  const posts = await getSortedPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post, posts } }));
+}
+
+const { post, posts } = Astro.props;
+const { Content } = await render(post);
+const related = posts.filter((p) => p.id !== post.id).slice(0, 3);
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.data.title,
+  description: post.data.excerpt,
+  datePublished: post.data.date.toISOString(),
+  inLanguage: 'es-MX',
+  author: { '@type': 'Physician', name: site.name, '@id': `${site.url}/#physician` },
+  mainEntityOfPage: new URL(`/blog/${post.id}/`, site.url).href,
+};
+---
+
+<Base title={post.data.title} description={post.data.excerpt} type="article" jsonLd={[articleSchema]}>
+  <article class="container-page py-12 sm:py-16">
+    <div class="mx-auto max-w-3xl">
+      <a href="/blog/" class="inline-flex items-center gap-1.5 rounded-full bg-mist px-4 py-2 text-base font-semibold text-ink hover:bg-line">
+        <ArrowLeft class="size-4" aria-hidden="true" />
+        Todas las guías
+      </a>
+
+      <header class="mt-8 border-b border-line pb-8">
+        <h1 class="text-4xl leading-tight sm:text-5xl">{post.data.title}</h1>
+        {post.data.excerpt && <p class="mt-4 text-xl text-muted">{post.data.excerpt}</p>}
+        <div class="mt-6 flex items-center gap-3">
+          <img src="/logo-mark.svg" alt="" width="40" height="40" class="size-10 rounded-full bg-brand-50 p-1.5" />
+          <p class="text-base leading-tight">
+            <strong class="block">{site.name}</strong>
+            <span class="text-muted">
+              <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>{' · '}
+              {readingTime(post.body)} min de lectura
+            </span>
+          </p>
+        </div>
+      </header>
+
+      <div
+        class="prose prose-lg mt-10 max-w-none prose-headings:font-bold prose-headings:text-ink prose-p:text-ink/90 prose-a:text-brand-700 prose-strong:text-ink prose-li:text-ink/90 prose-li:marker:text-brand-300 sm:prose-xl"
+      >
+        <Content />
+      </div>
+
+      <p class="mt-10 rounded-2xl bg-mist p-5 text-base text-muted">
+        Este artículo es informativo y no sustituye una valoración médica. Si nota cambios en la salud de su familiar,
+        consulte a su médico.
+      </p>
+
+      <div class="mt-10">
+        <BookingCTA />
+      </div>
+    </div>
+
+    {
+      related.length > 0 && (
+        <section class="mx-auto mt-20 max-w-6xl" aria-labelledby="mas-guias">
+          <h2 id="mas-guias" class="section-title">Otras guías que pueden ayudarle</h2>
+          <div class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {related.map((p, i) => <PostCard post={p} index={i} />)}
+          </div>
+        </section>
+      )
+    }
+  </article>
+</Base>

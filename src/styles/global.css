@@ -1,0 +1,149 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@import "@fontsource-variable/figtree";
+
+/*
+ * Tema sereno: fondos que alternan blanco y gris claro, un violeta azulado como color de marca
+ * (lejos de los tonos guinda/vino) y un solo acento cálido naranja, usado con moderación.
+ * Inspiración: BetterHelp / Headspace. Textos con contraste AA.
+ */
+@theme {
+  --font-sans: "Figtree Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Figtree Variable", ui-sans-serif, system-ui, sans-serif;
+
+  /* Marca */
+  --color-brand-50: #f5f3ff;
+  --color-brand-100: #ece8ff;
+  --color-brand-200: #dad3ff;
+  --color-brand-300: #bcb0fb;
+  --color-brand-500: #7c6beb;
+  --color-brand-600: #6552dc;
+  --color-brand-700: #5341c4;
+  --color-brand-800: #4433a0;
+
+  /* Neutros: blanco y gris claro alternados */
+  --color-mist: #f5f4f2;
+  --color-line: #e8e6e2;
+  --color-ink: #1e1b2e;
+  --color-muted: #5b5868;
+
+  /* Único acento cálido (naranja), usado con moderación (subrayados y un par de formas) */
+  --color-accent: #f47d31;
+
+  --color-whatsapp: #128c4b;
+  --color-whatsapp-dark: #0e7340;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    @apply bg-white font-sans text-ink antialiased;
+    font-size: 1.125rem;
+    line-height: 1.65;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display font-bold text-ink;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-brand-500);
+    outline-offset: 3px;
+    border-radius: 8px;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
+  }
+
+  /* Bloque redondeado de ancho casi completo (estilo Headspace) */
+  .panel {
+    @apply mx-2.5 overflow-hidden rounded-[2rem] sm:mx-4 sm:rounded-[3rem];
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-base font-semibold text-brand-700;
+  }
+  .eyebrow::before {
+    content: "";
+    @apply h-0.5 w-6 rounded-full bg-current;
+  }
+
+  .section-title {
+    @apply font-display text-[2rem] leading-[1.15] font-bold sm:text-[2.75rem];
+  }
+
+  .btn {
+    @apply inline-flex min-h-13 items-center justify-center gap-2 rounded-full px-7 py-3 text-base font-semibold whitespace-nowrap transition-colors duration-150 sm:text-lg;
+  }
+  .btn svg {
+    @apply size-5 shrink-0;
+  }
+  .btn-primary {
+    @apply bg-brand-700 text-white hover:bg-brand-800;
+  }
+  .btn-dark {
+    @apply bg-ink text-white hover:bg-ink/85;
+  }
+  .btn-whatsapp {
+    @apply bg-whatsapp text-white hover:bg-whatsapp-dark;
+  }
+  .btn-outline {
+    @apply border-2 border-ink/15 bg-white text-ink hover:border-ink/30;
+  }
+  .btn-light {
+    @apply bg-white text-ink hover:bg-mist;
+  }
+
+  /* Tarjetas planas, sin sombra */
+  .card {
+    @apply rounded-[1.75rem] bg-mist p-6 sm:p-8;
+  }
+  .card-white {
+    @apply rounded-[1.75rem] border border-line bg-white p-6 sm:p-8;
+  }
+
+  .icon-bubble {
+    @apply inline-flex size-14 shrink-0 items-center justify-center rounded-full bg-white;
+  }
+  .icon-bubble svg {
+    @apply size-7;
+  }
+
+  /* Foto con forma de arco */
+  .arch {
+    @apply rounded-t-[999px] rounded-b-[2rem];
+  }
+
+  .link {
+    @apply font-semibold text-brand-700 underline decoration-brand-300 decoration-2 underline-offset-4 hover:decoration-brand-700;
+  }
+}

@@ -1,0 +1,21 @@
+---
+import CalendarCheck from '@lucide/astro/icons/calendar-check';
+import WhatsAppIcon from './WhatsAppIcon.astro';
+import { site } from '../config/site';
+---
+
+<!-- Barra fija en móvil: las dos acciones principales siempre a un toque -->
+<div
+  class="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 px-3 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_-12px_rgba(31,28,58,0.25)] backdrop-blur lg:hidden"
+>
+  <div class="mx-auto grid max-w-md grid-cols-2 gap-2.5">
+    <a href={site.whatsapp.href} target="_blank" rel="noopener" class="btn btn-whatsapp px-3">
+      <WhatsAppIcon class="size-5" />
+      WhatsApp
+    </a>
+    <a href="/#agendar" class="btn btn-primary px-3">
+      <CalendarCheck aria-hidden="true" />
+      Agendar cita
+    </a>
+  </div>
+</div>

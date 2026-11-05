@@ -1,0 +1,34 @@
+---
+import CalendarCheck from '@lucide/astro/icons/calendar-check';
+import WhatsAppIcon from './WhatsAppIcon.astro';
+import { site } from '../config/site';
+
+interface Props {
+  title?: string;
+  text?: string;
+}
+const {
+  title = '¿Le preocupa la salud de su familiar?',
+  text = 'Una valoración geriátrica integral le ayudará a entender qué está pasando y qué hacer. Con gusto le acompaño.',
+} = Astro.props;
+---
+
+<aside class="relative overflow-hidden rounded-[2rem] bg-brand-50 p-7 sm:p-10">
+  <div aria-hidden="true" class="pointer-events-none absolute -top-12 -right-10 size-40 rounded-full bg-brand-100"></div>
+    <div class="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+    <div class="max-w-xl">
+      <p class="text-2xl font-bold sm:text-3xl">{title}</p>
+      <p class="mt-2 text-lg text-ink/75">{text}</p>
+    </div>
+    <div class="flex flex-col gap-3 sm:flex-row">
+      <a href="/#agendar" class="btn btn-primary">
+        <CalendarCheck aria-hidden="true" />
+        Agendar cita
+      </a>
+      <a href={site.whatsapp.href} target="_blank" rel="noopener" class="btn btn-whatsapp">
+        <WhatsAppIcon />
+        WhatsApp
+      </a>
+    </div>
+  </div>
+</aside>

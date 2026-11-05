@@ -1,0 +1,96 @@
+---
+import CalendarCheck from '@lucide/astro/icons/calendar-check';
+import Phone from '@lucide/astro/icons/phone';
+import Menu from '@lucide/astro/icons/menu';
+import X from '@lucide/astro/icons/x';
+import { site, nav } from '../config/site';
+---
+
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md supports-[backdrop-filter]:bg-white/75">
+  <div class="container-page flex h-18 items-center justify-between gap-4 sm:h-20">
+    <a href="/" class="flex items-center gap-3" aria-label={`${site.name}, inicio`}>
+      <img src="/logo-mark.svg" alt="" width="44" height="44" class="size-10 sm:size-11" />
+      <span class="leading-tight whitespace-nowrap">
+        <span class="block text-lg font-bold text-ink sm:text-xl">{site.shortName}</span>
+        <span class="block text-sm text-muted">Geriatra · León, Gto.</span>
+      </span>
+    </a>
+
+    <nav aria-label="Principal" class="hidden xl:block">
+      <ul class="flex items-center gap-1">
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href} class="rounded-full px-3 py-2 text-base font-semibold whitespace-nowrap text-ink/75 hover:bg-mist hover:text-ink">
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <a href={site.phone.href} class="hidden items-center gap-2 px-2 font-semibold whitespace-nowrap text-ink hover:underline 2xl:inline-flex">
+        <Phone class="size-5" aria-hidden="true" />
+        {site.phone.display}
+      </a>
+      <a href="/#agendar" class="btn btn-primary hidden sm:inline-flex">
+        <CalendarCheck aria-hidden="true" />
+        Agendar cita
+      </a>
+      <button
+        type="button"
+        class="inline-flex size-12 items-center justify-center rounded-full text-ink hover:bg-mist xl:hidden"
+        aria-controls="menu-movil"
+        aria-expanded="false"
+        data-menu-toggle
+      >
+        <span class="sr-only">Abrir menú</span>
+        <Menu class="size-7" data-icon-open aria-hidden="true" />
+        <X class="hidden size-7" data-icon-close aria-hidden="true" />
+      </button>
+    </div>
+  </div>
+
+  <nav id="menu-movil" aria-label="Menú móvil" class="hidden border-t border-line bg-white xl:hidden">
+    <ul class="container-page flex flex-col py-3">
+      {
+        nav.map((item) => (
+          <li>
+            <a href={item.href} class="block rounded-2xl px-3 py-3.5 text-lg font-semibold text-ink hover:bg-mist" data-menu-link>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+      <li class="mt-2 grid gap-3 border-t border-line pt-4 pb-2">
+        <a href="/#agendar" class="btn btn-primary w-full" data-menu-link>
+          <CalendarCheck aria-hidden="true" />
+          Agendar cita
+        </a>
+        <a href={site.phone.href} class="btn btn-outline w-full">
+          <Phone aria-hidden="true" />
+          Llamar al {site.phone.display}
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const menu = document.getElementById('menu-movil');
+  if (toggle && menu) {
+    const setOpen = (open: boolean) => {
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.querySelector('.sr-only')!.textContent = open ? 'Cerrar menú' : 'Abrir menú';
+      menu.classList.toggle('hidden', !open);
+      toggle.querySelector('[data-icon-open]')?.classList.toggle('hidden', open);
+      toggle.querySelector('[data-icon-close]')?.classList.toggle('hidden', !open);
+    };
+    toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+    menu.querySelectorAll('[data-menu-link]').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('keydown', (e) => e.key === 'Escape' && setOpen(false));
+  }
+</script>

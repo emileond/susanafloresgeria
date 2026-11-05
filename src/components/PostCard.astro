@@ -1,0 +1,32 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ArrowRight from '@lucide/astro/icons/arrow-right';
+import BookOpen from '@lucide/astro/icons/book-open';
+import { formatDate, readingTime } from '../lib/blog';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+  index?: number;
+}
+const { post } = Astro.props;
+
+const tone = 'bg-white text-brand-700';
+---
+
+<article class="group relative flex flex-col rounded-[1.75rem] bg-mist p-6 transition-colors hover:bg-line sm:p-7">
+  <span class={`inline-flex size-12 items-center justify-center rounded-full ${tone}`} aria-hidden="true">
+    <BookOpen class="size-6" />
+  </span>
+  <p class="mt-5 text-sm text-muted">
+    <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>{' · '}
+    {readingTime(post.body)} min de lectura
+  </p>
+  <h3 class="mt-2 text-xl leading-snug sm:text-[1.4rem]">
+    <a href={`/blog/${post.id}/`} class="after:absolute after:inset-0">{post.data.title}</a>
+  </h3>
+  {post.data.excerpt && <p class="mt-3 flex-1 text-base text-muted">{post.data.excerpt}</p>}
+  <span class="mt-5 inline-flex items-center gap-1.5 text-base font-semibold" aria-hidden="true">
+    Leer artículo
+    <ArrowRight class="size-4 transition-transform group-hover:translate-x-1" />
+  </span>
+</article>
