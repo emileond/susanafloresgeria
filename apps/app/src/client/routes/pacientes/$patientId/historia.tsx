@@ -9,7 +9,9 @@ import { Textarea } from '../../../components/ui/Field';
 import { Badge, EmptyState, ErrorState } from '../../../components/ui/misc';
 import { PageLoader } from '../../../components/ui/Spinner';
 import { ApiError } from '../../../lib/api';
-import { useHistory, useSaveHistory } from '../../../lib/queries';
+import { AiReview, AiSelectDialog } from '../../../features/AiHistory';
+import { useHistory, useMe, useSaveHistory } from '../../../lib/queries';
+import type { AiHistoryDraft } from '../../../../shared/types';
 
 export const Route = createFileRoute('/pacientes/$patientId/historia')({ component: HistoryPage });
 
@@ -20,6 +22,9 @@ function HistoryPage() {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<HistoryData>({});
   const [showVersions, setShowVersions] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiDraft, setAiDraft] = useState<AiHistoryDraft | null>(null);
+  const { data: me } = useMe();
 
   if (history.isPending) return <PageLoader />;
   if (history.isError) return <ErrorState error={history.error} onRetry={() => history.refetch()} />;
@@ -67,7 +72,12 @@ function HistoryPage() {
               <History aria-hidden /> Versiones ({history.data.versions.length})
             </Button>
           )}
-          {editing ? (
+          {!editing && !aiDraft && me?.features.ai && (
+            <Button variant="secondary" onClick={() => setAiOpen(true)}>
+              <Sparkles aria-hidden /> Completar con IA
+            </Button>
+          )}
+          {aiDraft ? null : editing ? (
             <>
               <Button variant="secondary" onClick={() => setEditing(false)}>
                 Cancelar
@@ -99,7 +109,11 @@ function HistoryPage() {
         </ul>
       )}
 
-      {!current && !editing ? (
+      <AiSelectDialog patientId={patientId} open={aiOpen} onOpenChange={setAiOpen} onDraft={setAiDraft} />
+
+      {aiDraft ? (
+        <AiReview patientId={patientId} draft={aiDraft} current={current?.data ?? {}} onDone={() => setAiDraft(null)} />
+      ) : !current && !editing ? (
         <div className="mt-5">
           <EmptyState
             icon={<ScrollText />}

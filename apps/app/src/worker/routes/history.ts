@@ -1,10 +1,12 @@
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, inArray } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { z } from 'zod';
+import { ageFromBirthDate } from '../../shared/format';
 import type { HistoryData } from '../../shared/history';
-import { historyInput } from '../../shared/schemas';
-import type { HistoryResponse, HistoryVersionMeta } from '../../shared/types';
-import { clinicalHistories, users } from '../db/schema';
+import { aiHistoryDraftInput, historyInput } from '../../shared/schemas';
+import type { AiHistoryDraft, HistoryResponse, HistoryVersionMeta } from '../../shared/types';
+import { AiError, createAnthropic, draftHistory } from '../ai/history';
+import { clinicalHistories, notes, patientContacts, users } from '../db/schema';
 import { audit } from '../lib/audit';
 import { requireClinical } from '../lib/auth';
 import { apiError, notFound } from '../lib/errors';
@@ -94,4 +96,53 @@ export const historyRoutes = new Hono<AppEnv>()
       }
     }
     throw apiError(409, 'conflict', 'No se pudo guardar. Intente de nuevo.');
+  })
+
+  // Propuesta de la IA a partir de notas seleccionadas. No guarda nada: la doctora revisa y acepta.
+  .post('/ai-draft', validate('param', patientParam), validate('json', aiHistoryDraftInput), async (c) => {
+    const { patientId } = c.req.valid('param');
+    const { noteIds } = c.req.valid('json');
+    const client = createAnthropic(c.env);
+    if (!client) throw apiError(503, 'ai_disabled', 'El asistente de IA no está configurado.');
+
+    const { success } = await c.env.AI_LIMITER.limit({ key: c.get('user').id });
+    if (!success) throw apiError(429, 'rate_limited', 'Demasiadas solicitudes al asistente. Espere un minuto.');
+
+    const db = c.get('db');
+    const patient = await getPatientOr404(db, patientId);
+    const [selected, contacts, versions] = await Promise.all([
+      db
+        .select()
+        .from(notes)
+        .where(and(eq(notes.patientId, patientId), inArray(notes.id, noteIds)))
+        .orderBy(notes.visitDate),
+      db.select({ name: patientContacts.name }).from(patientContacts).where(eq(patientContacts.patientId, patientId)),
+      listVersions(db, patientId),
+    ]);
+    if (!selected.length) throw apiError(422, 'no_notes', 'Seleccione al menos una nota del paciente.');
+
+    const sexLabel = patient.sex === 'F' ? 'femenino' : patient.sex === 'M' ? 'masculino' : 'no especificado';
+    const context = `Paciente de ${ageFromBirthDate(patient.birthDate)} años, sexo ${sexLabel}.`;
+    const current = (versions[0]?.data ?? {}) as HistoryData;
+    const model = c.env.AI_MODEL || 'claude-haiku-5-5';
+
+    try {
+      const proposals = await draftHistory(
+        client,
+        model,
+        selected,
+        current,
+        { names: [patient.fullName, ...contacts.map((x) => x.name)], curp: patient.curp },
+        context,
+      );
+      audit(c, { action: 'create', entity: 'clinical_history_ai_draft', patientId });
+      const body: AiHistoryDraft = { proposals, notesUsed: selected.length, model };
+      return c.json(body);
+    } catch (err) {
+      if (err instanceof AiError) {
+        const status = err.code === 'rate_limited' ? 429 : err.code === 'upstream' ? 502 : 422;
+        throw apiError(status, `ai_${err.code}`, err.message);
+      }
+      throw err;
+    }
   });

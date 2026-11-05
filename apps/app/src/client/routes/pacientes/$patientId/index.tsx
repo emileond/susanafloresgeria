@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { ChevronRight, FileText, Phone, Pill, ScrollText, UserRound } from 'lucide-react';
+import { ChevronRight, ClipboardList, FileText, Phone, Pill, ScrollText, UserRound } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { NOTE_TYPE_LABELS } from '../../../../shared/constants';
 import { formatDate } from '../../../../shared/format';
+import { SCALES_BY_KEY } from '../../../../shared/scales';
 import { Badge } from '../../../components/ui/misc';
-import { useMe, useMedications, useNotes, usePatient } from '../../../lib/queries';
+import { SEVERITY_TONE } from '../../../features/scaleUi';
+import { useAssessments, useMe, useMedications, useNotes, usePatient } from '../../../lib/queries';
 
 export const Route = createFileRoute('/pacientes/$patientId/')({ component: Summary });
 
@@ -36,11 +38,14 @@ function Summary() {
   const clinical = me?.canEditClinical ?? false;
   const meds = useMedications(clinical ? patientId : '');
   const notes = useNotes(clinical ? patientId : '');
+  const assessments = useAssessments(clinical ? patientId : '');
   if (!p) return null;
 
   const activeMeds = (meds.data ?? []).filter((m) => m.active);
   const lastSigned = (notes.data ?? []).find((n) => n.status === 'signed');
   const primary = p.contacts.find((c) => c.isPrimary) ?? p.contacts[0];
+  // Último resultado de cada escala (la lista viene ordenada del más reciente al más antiguo).
+  const latest = (assessments.data ?? []).filter((a, i, arr) => arr.findIndex((x) => x.scaleKey === a.scaleKey) === i);
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
@@ -110,6 +115,28 @@ function Summary() {
                 </Badge>
               )}
             </p>
+          )}
+        </Card>
+      )}
+
+      {clinical && (
+        <Card title="Escalas recientes" icon={<ClipboardList />} action={seeAll('/pacientes/$patientId/escalas', patientId)}>
+          {latest.length ? (
+            <ul className="grid gap-2">
+              {latest.slice(0, 5).map((a) => (
+                <li key={a.id} className="flex flex-wrap items-center gap-2">
+                  <span className="w-24 font-semibold">{SCALES_BY_KEY[a.scaleKey]?.shortName ?? a.scaleKey}</span>
+                  <Badge tone={SEVERITY_TONE[a.severity]}>
+                    {a.score}/{a.maxScore}
+                  </Badge>
+                  <span className="text-sm text-muted">
+                    {a.interpretation} · {formatDate(a.performedAt)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-muted">Aún no se han aplicado escalas.</p>
           )}
         </Card>
       )}

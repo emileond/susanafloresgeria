@@ -29,8 +29,18 @@
     // "Application Audience (AUD) Tag" de la aplicación de Access
     "ACCESS_AUD": "",
     // Correo que se da de alta automáticamente como doctora/administradora en el primer acceso
-    "BOOTSTRAP_ADMIN_EMAIL": ""
+    "BOOTSTRAP_ADMIN_EMAIL": "",
+    // Escalas con licencia habilitadas, separadas por coma (p. ej. "mna-sf,zarit"), una vez confirmados sus términos de uso
+    "LICENSED_SCALES": "",
+    // Asistente de IA (historia clínica). La clave va como secreto: `wrangler secret put ANTHROPIC_API_KEY`.
+    "AI_MODEL": "claude-haiku-5-5",
+    // URL de Cloudflare AI Gateway para Anthropic: https://gateway.ai.cloudflare.com/v1/<ACCOUNT_ID>/<GATEWAY>/anthropic
+    "AI_GATEWAY_URL": ""
   },
+  // Límite de uso del asistente de IA por usuario (Workers Rate Limiting)
+  "ratelimits": [
+    { "name": "AI_LIMITER", "namespace_id": "1001", "simple": { "limit": 10, "period": 60 } }
+  ],
   "observability": {
     "enabled": true
   }

@@ -9,6 +9,7 @@ export interface Me {
   name: string;
   role: Role;
   canEditClinical: boolean;
+  features: { ai: boolean; scales: string[] };
 }
 
 export interface PatientListItem {
@@ -119,4 +120,30 @@ export interface Dashboard {
 
 export interface ApiErrorBody {
   error: { code: string; message: string; fields?: Record<string, string> };
+}
+
+export interface AssessmentItem {
+  id: string;
+  patientId: string;
+  noteId: string | null;
+  scaleKey: string;
+  scaleVersion: number;
+  answers: Record<string, number>;
+  score: number;
+  maxScore: number;
+  interpretation: string;
+  severity: 'normal' | 'mild' | 'moderate' | 'severe';
+  details: { label: string; value: string }[] | null;
+  respondent: string | null;
+  comment: string | null;
+  performedAt: string;
+  createdAt: string;
+  createdByName: string | null;
+}
+
+export interface AiHistoryDraft {
+  /** Propuesta por sección (solo las secciones con información nueva o integrada). */
+  proposals: Partial<Record<string, string>>;
+  notesUsed: number;
+  model: string;
 }

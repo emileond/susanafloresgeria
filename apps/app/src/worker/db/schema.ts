@@ -162,6 +162,33 @@ export const medications = sqliteTable(
   (t) => [index('meds_patient_idx').on(t.patientId)],
 );
 
+/** Resultados de escalas geriátricas. La puntuación la calcula el servidor; un resultado guardado no se modifica. */
+export const assessments = sqliteTable(
+  'assessments',
+  {
+    id: id(),
+    patientId: text('patient_id')
+      .notNull()
+      .references(() => patients.id),
+    noteId: text('note_id').references(() => notes.id),
+    scaleKey: text('scale_key').notNull(),
+    scaleVersion: integer('scale_version').notNull(),
+    answers: text('answers', { mode: 'json' }).notNull().$type<Record<string, number>>(),
+    score: integer('score').notNull(),
+    maxScore: integer('max_score').notNull(),
+    interpretation: text('interpretation').notNull(),
+    severity: text('severity', { enum: ['normal', 'mild', 'moderate', 'severe'] }).notNull(),
+    details: text('details', { mode: 'json' }).$type<{ label: string; value: string }[]>(),
+    /** Quién respondió (paciente, cuidador u observación) y comentario breve. */
+    respondent: text('respondent'),
+    comment: text('comment'),
+    performedAt: text('performed_at').notNull(),
+    ...timestamps,
+    ...authorship,
+  },
+  (t) => [index('assessments_patient_idx').on(t.patientId, t.scaleKey, t.performedAt)],
+);
+
 /** Bitácora de accesos y cambios (NOM-024): quién, qué, cuándo. Nunca guarda contenido clínico. */
 export const auditLog = sqliteTable(
   'audit_log',
@@ -188,3 +215,4 @@ export type ClinicalHistory = typeof clinicalHistories.$inferSelect;
 export type Note = typeof notes.$inferSelect;
 export type FileRecord = typeof files.$inferSelect;
 export type Medication = typeof medications.$inferSelect;
+export type Assessment = typeof assessments.$inferSelect;

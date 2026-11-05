@@ -15,6 +15,7 @@ const TABS = [
   { to: '/pacientes/$patientId', label: 'Resumen', exact: true, clinical: false },
   { to: '/pacientes/$patientId/notas', label: 'Notas', exact: false, clinical: true },
   { to: '/pacientes/$patientId/historia', label: 'Historia clínica', exact: false, clinical: true },
+  { to: '/pacientes/$patientId/escalas', label: 'Escalas', exact: false, clinical: true },
   { to: '/pacientes/$patientId/archivos', label: 'Archivos', exact: false, clinical: true },
   { to: '/pacientes/$patientId/medicamentos', label: 'Medicamentos', exact: false, clinical: true },
   { to: '/pacientes/$patientId/datos', label: 'Datos y contactos', exact: false, clinical: false },
@@ -83,9 +84,9 @@ function PatientLayout() {
               <Link to="/pacientes/$patientId/archivos" params={{ patientId }} search={{ subir: true }} className="inline-flex h-11 items-center gap-2 rounded-xl border border-line bg-white px-4 font-semibold hover:bg-mist">
                 <Upload className="size-4.5" aria-hidden /> Subir archivo
               </Link>
-              <Button variant="secondary" disabled title="Disponible en la siguiente versión">
-                <ClipboardList aria-hidden /> Aplicar escala
-              </Button>
+              <Link to="/pacientes/$patientId/escalas" params={{ patientId }} className="inline-flex h-11 items-center gap-2 rounded-xl border border-line bg-white px-4 font-semibold hover:bg-mist">
+                <ClipboardList className="size-4.5" aria-hidden /> Aplicar escala
+              </Link>
               <Link to="/agenda" className="inline-flex h-11 items-center gap-2 rounded-xl border border-line bg-white px-4 font-semibold hover:bg-mist">
                 <CalendarPlus className="size-4.5" aria-hidden /> Agendar
               </Link>

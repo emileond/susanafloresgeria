@@ -109,3 +109,25 @@ export const searchQuery = z.object({
   limit: z.number().int().min(1).max(100).default(30),
   includeArchived: z.boolean().optional(),
 });
+
+/** Aplicación de una escala. El servidor recalcula la puntuación a partir de las respuestas. */
+export const assessmentInput = z.object({
+  scaleKey: z.string().min(1).max(40),
+  answers: z.record(z.string().max(20), z.number().int().min(0).max(20)),
+  performedAt: isoDate,
+  respondent: z.enum(['paciente', 'cuidador', 'observacion']).optional(),
+  comment: optionalText(1000),
+  /** Agregar el resultado a una nota: ninguna, una nota nueva o un borrador existente. */
+  attach: z
+    .discriminatedUnion('mode', [
+      z.object({ mode: z.literal('none') }),
+      z.object({ mode: z.literal('new_note') }),
+      z.object({ mode: z.literal('note'), noteId: z.uuid() }),
+    ])
+    .default({ mode: 'none' }),
+});
+export type AssessmentInput = z.input<typeof assessmentInput>;
+
+export const aiHistoryDraftInput = z.object({
+  noteIds: z.array(z.uuid()).min(1, 'Seleccione al menos una nota').max(30),
+});

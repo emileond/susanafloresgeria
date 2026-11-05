@@ -2,5 +2,5 @@
 ENVIRONMENT=development
 # En local no hay Cloudflare Access: se usa este usuario de prueba.
 DEV_USER_EMAIL=doctora@example.com
-# Opcional (PR B): clave de Anthropic para probar el llenado con IA
-# ANTHROPIC_API_KEY=
+# Opcional: clave de Anthropic para probar el llenado de historia clínica con IA (vacío = desactivado)
+ANTHROPIC_API_KEY=

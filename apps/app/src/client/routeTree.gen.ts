@@ -18,6 +18,8 @@ import { Route as PacientesPatientIdArchivosRouteImport } from './routes/pacient
 import { Route as PacientesPatientIdDatosRouteImport } from './routes/pacientes/$patientId/datos'
 import { Route as PacientesPatientIdHistoriaRouteImport } from './routes/pacientes/$patientId/historia'
 import { Route as PacientesPatientIdMedicamentosRouteImport } from './routes/pacientes/$patientId/medicamentos'
+import { Route as PacientesPatientIdEscalasIndexRouteImport } from './routes/pacientes/$patientId/escalas/index'
+import { Route as PacientesPatientIdEscalasScaleKeyRouteImport } from './routes/pacientes/$patientId/escalas/$scaleKey'
 import { Route as PacientesPatientIdNotasIndexRouteImport } from './routes/pacientes/$patientId/notas/index'
 import { Route as PacientesPatientIdNotasNoteIdRouteImport } from './routes/pacientes/$patientId/notas/$noteId'
 
@@ -69,6 +71,18 @@ const PacientesPatientIdMedicamentosRoute =
     path: '/medicamentos',
     getParentRoute: () => PacientesPatientIdRoute,
   } as any)
+const PacientesPatientIdEscalasIndexRoute =
+  PacientesPatientIdEscalasIndexRouteImport.update({
+    id: '/escalas/',
+    path: '/escalas/',
+    getParentRoute: () => PacientesPatientIdRoute,
+  } as any)
+const PacientesPatientIdEscalasScaleKeyRoute =
+  PacientesPatientIdEscalasScaleKeyRouteImport.update({
+    id: '/escalas/$scaleKey',
+    path: '/escalas/$scaleKey',
+    getParentRoute: () => PacientesPatientIdRoute,
+  } as any)
 const PacientesPatientIdNotasIndexRoute =
   PacientesPatientIdNotasIndexRouteImport.update({
     id: '/notas/',
@@ -92,7 +106,9 @@ export interface FileRoutesByFullPath {
   '/pacientes/$patientId/historia': typeof PacientesPatientIdHistoriaRoute
   '/pacientes/$patientId/medicamentos': typeof PacientesPatientIdMedicamentosRoute
   '/pacientes/$patientId/': typeof PacientesPatientIdIndexRoute
+  '/pacientes/$patientId/escalas/$scaleKey': typeof PacientesPatientIdEscalasScaleKeyRoute
   '/pacientes/$patientId/notas/$noteId': typeof PacientesPatientIdNotasNoteIdRoute
+  '/pacientes/$patientId/escalas/': typeof PacientesPatientIdEscalasIndexRoute
   '/pacientes/$patientId/notas/': typeof PacientesPatientIdNotasIndexRoute
 }
 export interface FileRoutesByTo {
@@ -104,7 +120,9 @@ export interface FileRoutesByTo {
   '/pacientes/$patientId/historia': typeof PacientesPatientIdHistoriaRoute
   '/pacientes/$patientId/medicamentos': typeof PacientesPatientIdMedicamentosRoute
   '/pacientes/$patientId': typeof PacientesPatientIdIndexRoute
+  '/pacientes/$patientId/escalas/$scaleKey': typeof PacientesPatientIdEscalasScaleKeyRoute
   '/pacientes/$patientId/notas/$noteId': typeof PacientesPatientIdNotasNoteIdRoute
+  '/pacientes/$patientId/escalas': typeof PacientesPatientIdEscalasIndexRoute
   '/pacientes/$patientId/notas': typeof PacientesPatientIdNotasIndexRoute
 }
 export interface FileRoutesById {
@@ -118,7 +136,9 @@ export interface FileRoutesById {
   '/pacientes/$patientId/historia': typeof PacientesPatientIdHistoriaRoute
   '/pacientes/$patientId/medicamentos': typeof PacientesPatientIdMedicamentosRoute
   '/pacientes/$patientId/': typeof PacientesPatientIdIndexRoute
+  '/pacientes/$patientId/escalas/$scaleKey': typeof PacientesPatientIdEscalasScaleKeyRoute
   '/pacientes/$patientId/notas/$noteId': typeof PacientesPatientIdNotasNoteIdRoute
+  '/pacientes/$patientId/escalas/': typeof PacientesPatientIdEscalasIndexRoute
   '/pacientes/$patientId/notas/': typeof PacientesPatientIdNotasIndexRoute
 }
 export interface FileRouteTypes {
@@ -133,7 +153,9 @@ export interface FileRouteTypes {
     | '/pacientes/$patientId/historia'
     | '/pacientes/$patientId/medicamentos'
     | '/pacientes/$patientId/'
+    | '/pacientes/$patientId/escalas/$scaleKey'
     | '/pacientes/$patientId/notas/$noteId'
+    | '/pacientes/$patientId/escalas/'
     | '/pacientes/$patientId/notas/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -145,7 +167,9 @@ export interface FileRouteTypes {
     | '/pacientes/$patientId/historia'
     | '/pacientes/$patientId/medicamentos'
     | '/pacientes/$patientId'
+    | '/pacientes/$patientId/escalas/$scaleKey'
     | '/pacientes/$patientId/notas/$noteId'
+    | '/pacientes/$patientId/escalas'
     | '/pacientes/$patientId/notas'
   id:
     | '__root__'
@@ -158,7 +182,9 @@ export interface FileRouteTypes {
     | '/pacientes/$patientId/historia'
     | '/pacientes/$patientId/medicamentos'
     | '/pacientes/$patientId/'
+    | '/pacientes/$patientId/escalas/$scaleKey'
     | '/pacientes/$patientId/notas/$noteId'
+    | '/pacientes/$patientId/escalas/'
     | '/pacientes/$patientId/notas/'
   fileRoutesById: FileRoutesById
 }
@@ -234,6 +260,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PacientesPatientIdMedicamentosRouteImport
       parentRoute: typeof PacientesPatientIdRoute
     }
+    '/pacientes/$patientId/escalas/': {
+      id: '/pacientes/$patientId/escalas/'
+      path: '/escalas'
+      fullPath: '/pacientes/$patientId/escalas/'
+      preLoaderRoute: typeof PacientesPatientIdEscalasIndexRouteImport
+      parentRoute: typeof PacientesPatientIdRoute
+    }
+    '/pacientes/$patientId/escalas/$scaleKey': {
+      id: '/pacientes/$patientId/escalas/$scaleKey'
+      path: '/escalas/$scaleKey'
+      fullPath: '/pacientes/$patientId/escalas/$scaleKey'
+      preLoaderRoute: typeof PacientesPatientIdEscalasScaleKeyRouteImport
+      parentRoute: typeof PacientesPatientIdRoute
+    }
     '/pacientes/$patientId/notas/': {
       id: '/pacientes/$patientId/notas/'
       path: '/notas'
@@ -257,7 +297,9 @@ interface PacientesPatientIdRouteChildren {
   PacientesPatientIdHistoriaRoute: typeof PacientesPatientIdHistoriaRoute
   PacientesPatientIdMedicamentosRoute: typeof PacientesPatientIdMedicamentosRoute
   PacientesPatientIdIndexRoute: typeof PacientesPatientIdIndexRoute
+  PacientesPatientIdEscalasScaleKeyRoute: typeof PacientesPatientIdEscalasScaleKeyRoute
   PacientesPatientIdNotasNoteIdRoute: typeof PacientesPatientIdNotasNoteIdRoute
+  PacientesPatientIdEscalasIndexRoute: typeof PacientesPatientIdEscalasIndexRoute
   PacientesPatientIdNotasIndexRoute: typeof PacientesPatientIdNotasIndexRoute
 }
 
@@ -267,7 +309,10 @@ const PacientesPatientIdRouteChildren: PacientesPatientIdRouteChildren = {
   PacientesPatientIdHistoriaRoute: PacientesPatientIdHistoriaRoute,
   PacientesPatientIdMedicamentosRoute: PacientesPatientIdMedicamentosRoute,
   PacientesPatientIdIndexRoute: PacientesPatientIdIndexRoute,
+  PacientesPatientIdEscalasScaleKeyRoute:
+    PacientesPatientIdEscalasScaleKeyRoute,
   PacientesPatientIdNotasNoteIdRoute: PacientesPatientIdNotasNoteIdRoute,
+  PacientesPatientIdEscalasIndexRoute: PacientesPatientIdEscalasIndexRoute,
   PacientesPatientIdNotasIndexRoute: PacientesPatientIdNotasIndexRoute,
 }
 
