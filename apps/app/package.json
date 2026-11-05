@@ -17,6 +17,7 @@
     "cf-typegen": "wrangler types --strict-vars=false src/worker/worker-configuration.d.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.5.0",
     "@hono/zod-validator": "^0.9.1",
     "@hookform/resolvers": "^7.0.2",
     "@susanafloresgeria/theme": "*",

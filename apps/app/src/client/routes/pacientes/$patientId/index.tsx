@@ -1,10 +1,13 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { ChevronRight, FileText, Phone, Pill, ScrollText, UserRound } from 'lucide-react';
+import { ChevronRight, ClipboardList, FileText, Phone, Pill, ScrollText, UserRound } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { NOTE_TYPE_LABELS } from '../../../../shared/constants';
 import { formatDate } from '../../../../shared/format';
+import { SCALES_BY_KEY } from '../../../../shared/scales';
 import { Badge } from '../../../components/ui/misc';
-import { useMe, useMedications, useNotes, usePatient } from '../../../lib/queries';
+import { ScoreGauge } from '../../../components/scales/ScoreGauge';
+import { SEVERITY_STYLE } from '../../../features/scaleUi';
+import { useAssessments, useMe, useMedications, useNotes, usePatient } from '../../../lib/queries';
 
 export const Route = createFileRoute('/pacientes/$patientId/')({ component: Summary });
 
@@ -36,11 +39,14 @@ function Summary() {
   const clinical = me?.canEditClinical ?? false;
   const meds = useMedications(clinical ? patientId : '');
   const notes = useNotes(clinical ? patientId : '');
+  const assessments = useAssessments(clinical ? patientId : '');
   if (!p) return null;
 
   const activeMeds = (meds.data ?? []).filter((m) => m.active);
   const lastSigned = (notes.data ?? []).find((n) => n.status === 'signed');
   const primary = p.contacts.find((c) => c.isPrimary) ?? p.contacts[0];
+  // Último resultado de cada escala (la lista viene ordenada del más reciente al más antiguo).
+  const latest = (assessments.data ?? []).filter((a, i, arr) => arr.findIndex((x) => x.scaleKey === a.scaleKey) === i);
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
@@ -110,6 +116,35 @@ function Summary() {
                 </Badge>
               )}
             </p>
+          )}
+        </Card>
+      )}
+
+      {clinical && (
+        <Card title="Escalas recientes" icon={<ClipboardList />} action={seeAll('/pacientes/$patientId/escalas', patientId)}>
+          {latest.length ? (
+            <ul className="grid gap-3">
+              {latest.slice(0, 4).map((a) => {
+                const scale = SCALES_BY_KEY[a.scaleKey];
+                const st = SEVERITY_STYLE[a.severity];
+                return (
+                  <li key={a.id}>
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="font-semibold">{scale?.shortName ?? a.scaleKey}</span>
+                      <span className={`text-sm font-bold tabular-nums ${st.text}`}>
+                        {a.score}/{a.maxScore}
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted">
+                      <span className={`font-semibold ${st.text}`}>{a.interpretation}</span> · {formatDate(a.performedAt)}
+                    </p>
+                    {scale && <ScoreGauge scale={scale} score={a.score} showLegend={false} className="-mt-3" />}
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p className="text-muted">Aún no se han aplicado escalas.</p>
           )}
         </Card>
       )}

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
+  AssessmentInput,
   ContactInput,
   HistoryInput,
   MedicationInput,
@@ -8,6 +9,8 @@ import type {
   PatientUpdateInput,
 } from '../../shared/schemas';
 import type {
+  AiHistoryDraft,
+  AssessmentItem,
   Dashboard,
   FileItem,
   HistoryResponse,
@@ -30,6 +33,7 @@ export const qk = {
   history: (patientId: string) => ['patient', patientId, 'history'] as const,
   files: (patientId: string) => ['patient', patientId, 'files'] as const,
   medications: (patientId: string) => ['patient', patientId, 'medications'] as const,
+  assessments: (patientId: string) => ['patient', patientId, 'assessments'] as const,
 };
 
 export const useMe = () => useQuery({ queryKey: qk.me, queryFn: () => api<Me>('/me'), staleTime: 5 * 60_000 });
@@ -182,3 +186,29 @@ export function useMedicationMutations(patientId: string) {
     }),
   };
 }
+
+// Escalas
+export const useAssessments = (patientId: string) =>
+  useQuery({ queryKey: qk.assessments(patientId), enabled: !!patientId, queryFn: () => api<AssessmentItem[]>(`/patients/${patientId}/assessments`) });
+
+export function useCreateAssessment(patientId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: AssessmentInput) => api<AssessmentItem>(`/patients/${patientId}/assessments`, { method: 'POST', json: input }),
+    onSuccess: (a) => {
+      void qc.invalidateQueries({ queryKey: qk.assessments(patientId) });
+      void qc.invalidateQueries({ queryKey: qk.patient(patientId) });
+      if (a.noteId) {
+        void qc.invalidateQueries({ queryKey: qk.notes(patientId) });
+        void qc.invalidateQueries({ queryKey: qk.note(a.noteId) });
+        void qc.invalidateQueries({ queryKey: qk.dashboard });
+      }
+    },
+  });
+}
+
+// Asistente de IA
+export const useAiHistoryDraft = (patientId: string) =>
+  useMutation({
+    mutationFn: (noteIds: string[]) => api<AiHistoryDraft>(`/patients/${patientId}/history/ai-draft`, { method: 'POST', json: { noteIds } }),
+  });

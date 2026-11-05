@@ -11,6 +11,8 @@ import { historyRoutes } from './routes/history';
 import { medicationRoutes, patientMedicationRoutes } from './routes/medications';
 import { noteRoutes, patientNoteRoutes } from './routes/notes';
 import { patientRoutes, toListItem } from './routes/patients';
+import { assessmentRoutes, patientAssessmentRoutes } from './routes/assessments';
+import { enabledScales } from '../shared/scales';
 import type { AppEnv } from './types';
 
 const api = new Hono<AppEnv>()
@@ -25,7 +27,17 @@ const api = new Hono<AppEnv>()
 
   .get('/me', (c) => {
     const u = c.get('user');
-    const me: Me = { id: u.id, email: u.email, name: u.name, role: u.role, canEditClinical: canEditClinical(u.role) };
+    const me: Me = {
+      id: u.id,
+      email: u.email,
+      name: u.name,
+      role: u.role,
+      canEditClinical: canEditClinical(u.role),
+      features: {
+        ai: Boolean(c.env.ANTHROPIC_API_KEY?.trim()),
+        scales: enabledScales(c.env.LICENSED_SCALES).map((s) => s.key),
+      },
+    };
     return c.json(me);
   })
 
@@ -59,6 +71,8 @@ const api = new Hono<AppEnv>()
   .route('/patients/:patientId/history', historyRoutes)
   .route('/patients/:patientId/files', patientFileRoutes)
   .route('/patients/:patientId/medications', patientMedicationRoutes)
+  .route('/patients/:patientId/assessments', patientAssessmentRoutes)
+  .route('/assessments', assessmentRoutes)
   .route('/notes', noteRoutes)
   .route('/files', fileRoutes)
   .route('/medications', medicationRoutes);

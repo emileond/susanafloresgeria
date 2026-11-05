@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { normalizeSearch } from '../../shared/format';
 import { contactInput, patientCreateInput, patientUpdateInput, searchQuery } from '../../shared/schemas';
 import type { Contact, PatientDetail, PatientListItem } from '../../shared/types';
-import { clinicalHistories, files, medications, notes, patientContacts, patients, type Patient } from '../db/schema';
+import { assessments, clinicalHistories, files, medications, notes, patientContacts, patients, type Patient } from '../db/schema';
 import { audit } from '../lib/audit';
 import { notFound } from '../lib/errors';
 import { newId } from '../lib/ids';
@@ -111,7 +111,7 @@ export const patientRoutes = new Hono<AppEnv>()
     const db = c.get('db');
     const p = await getPatientOr404(db, id);
 
-    const [contacts, medsCount, notesAgg, filesCount, history, lastNote] = await Promise.all([
+    const [contacts, medsCount, notesAgg, filesCount, history, lastNote, assessmentsCount] = await Promise.all([
       db.select().from(patientContacts).where(eq(patientContacts.patientId, id)).orderBy(desc(patientContacts.isPrimary)),
       db.select({ n: count() }).from(medications).where(and(eq(medications.patientId, id), eq(medications.active, true))),
       db
@@ -131,6 +131,7 @@ export const patientRoutes = new Hono<AppEnv>()
         .where(eq(notes.patientId, id))
         .orderBy(desc(notes.visitDate), desc(notes.createdAt))
         .limit(1),
+      db.select({ n: count() }).from(assessments).where(eq(assessments.patientId, id)),
     ]);
 
     audit(c, { action: 'view', entity: 'patient', entityId: id, patientId: id });
@@ -148,6 +149,7 @@ export const patientRoutes = new Hono<AppEnv>()
         notesCount: notesAgg[0]?.total ?? 0,
         draftNotes: Number(notesAgg[0]?.drafts ?? 0),
         filesCount: filesCount[0]?.n ?? 0,
+        assessmentsCount: assessmentsCount[0]?.n ?? 0,
         historyVersion: history[0]?.version ?? null,
         lastNote: lastNote[0] ?? null,
       },
