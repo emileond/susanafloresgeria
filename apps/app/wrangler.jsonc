@@ -1,11 +1,14 @@
 {
   // App de expedientes (privada). Se sirve detrás de Cloudflare Access en app.susanafloresgeria.com.
-  // Antes del primer despliegue: crear la base D1 y los buckets R2 y reemplazar database_id (ver README).
   "$schema": "../../node_modules/wrangler/config-schema.json",
   "name": "susanafloresgeria-app",
   "main": "./src/worker/index.ts",
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
+  // Solo se publica en el dominio protegido por Access (sin *.workers.dev ni URLs de vista previa).
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [{ "pattern": "app.susanafloresgeria.com", "custom_domain": true }],
   "assets": {
     "not_found_handling": "single-page-application",
     "run_worker_first": ["/api/*"]
@@ -14,7 +17,7 @@
     {
       "binding": "DB",
       "database_name": "susanafloresgeria-app",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "39510c56-352d-4224-be75-85b221e38323",
       "migrations_dir": "drizzle"
     }
   ],
@@ -25,11 +28,11 @@
   "vars": {
     "ENVIRONMENT": "production",
     // Dominio del equipo de Cloudflare Zero Trust, p. ej. "susanaflores.cloudflareaccess.com"
-    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_TEAM_DOMAIN": "umbrelhome.cloudflareaccess.com",
     // "Application Audience (AUD) Tag" de la aplicación de Access
-    "ACCESS_AUD": "",
-    // Correo que se da de alta automáticamente como doctora/administradora en el primer acceso
-    "BOOTSTRAP_ADMIN_EMAIL": "",
+    "ACCESS_AUD": "b7b1633cceb66e63b3aa3e2eccd922a3e296ef6265bf02f91bcfdee0f445638a",
+    // El correo que se da de alta como administradora en su primer acceso va como secreto
+    // (el repositorio es público): `wrangler secret put BOOTSTRAP_ADMIN_EMAIL`.
     // Escalas con licencia habilitadas, separadas por coma (p. ej. "mna-sf,zarit"), una vez confirmados sus términos de uso
     "LICENSED_SCALES": "",
     // Asistente de IA (historia clínica). La clave va como secreto: `wrangler secret put ANTHROPIC_API_KEY`.
