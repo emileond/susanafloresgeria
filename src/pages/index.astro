@@ -2,7 +2,6 @@
 import { Image } from 'astro:assets';
 import { getSortedPosts } from '../lib/blog';
 import Base from '../layouts/Base.astro';
-import WhatsAppIcon from '../components/WhatsAppIcon.astro';
 import DoctoraliaWidget from '../components/DoctoraliaWidget.astro';
 import PostCard from '../components/PostCard.astro';
 import Underline from '../components/Underline.astro';
@@ -28,7 +27,6 @@ import BadgeCheck from '@lucide/astro/icons/badge-check';
 import Languages from '@lucide/astro/icons/languages';
 import MapPin from '@lucide/astro/icons/map-pin';
 import Clock from '@lucide/astro/icons/clock';
-import Phone from '@lucide/astro/icons/phone';
 import Mail from '@lucide/astro/icons/mail';
 import ArrowRight from '@lucide/astro/icons/arrow-right';
 import Star from '@lucide/astro/icons/star';
@@ -123,6 +121,7 @@ const concerns = [
     signs: 'Cansancio, pérdida de peso o de apetito, ánimo bajo o cambios difíciles de explicar.',
     service: 'Valoración geriátrica integral',
     desc: 'Evaluación completa de lo físico, cognitivo, emocional y social para crear un plan de cuidados a su medida.',
+    post: 'primera-consulta-geriatrica-que-esperar',
   },
   {
     icon: HandHeart,
@@ -130,6 +129,7 @@ const concerns = [
     signs: 'Busca que esté cómodo, sin dolor y acompañado, idealmente en casa.',
     service: 'Cuidados paliativos',
     desc: 'Atención centrada en el confort y la dignidad, en consultorio o a domicilio, con apoyo a la familia.',
+    post: 'cuidados-paliativos-no-es-rendirse',
   },
 ];
 
@@ -154,7 +154,7 @@ const modalities = [
 const steps = [
   {
     title: 'Agende su cita',
-    desc: 'En línea a cualquier hora con Doctoralia, por WhatsApp o por teléfono. Puede agendarla usted en nombre de su familiar.',
+    desc: 'En línea, a cualquier hora, a través de Doctoralia. Puede agendarla usted en nombre de su familiar.',
   },
   {
     title: 'Venga acompañado',
@@ -209,10 +209,6 @@ const faqs = [
   {
     q: '¿Puedo acompañar a mi familiar a la consulta?',
     a: 'Sí, y se lo recomiendo. La información que aporta la familia es muy valiosa para la valoración, y así usted también resuelve sus dudas sobre los cuidados en casa.',
-  },
-  {
-    q: '¿Atiende a domicilio?',
-    a: `Sí. Realizo visitas a domicilio en León para personas mayores a las que se les dificulta trasladarse, incluidos cuidados paliativos en casa. Consulte disponibilidad para su zona.`,
   },
   {
     q: 'Vivo en otra ciudad, ¿puedo tener una consulta en línea?',
@@ -270,9 +266,8 @@ const quickTopics = ['Memoria', 'Caídas', 'Medicamentos', 'Enfermedades crónic
               <CalendarCheck aria-hidden="true" />
               Agendar cita
             </a>
-            <a href={site.whatsapp.href} target="_blank" rel="noopener" class="btn btn-whatsapp">
-              <WhatsAppIcon />
-              Escribir por WhatsApp
+            <a href="#servicios" class="btn btn-outline">
+              Ver servicios
             </a>
           </div>
 
@@ -365,11 +360,16 @@ const quickTopics = ['Memoria', 'Caídas', 'Medicamentos', 'Enfermedades crónic
             Más que tratar enfermedades: ayudar a su familiar a <Underline>vivir mejor</Underline>.
           </h2>
         </div>
-        <p class="text-lg text-muted">
-          Así como el pediatra se especializa en los niños, el geriatra se especializa en las personas mayores. Con la
-          edad, el cuerpo cambia: las enfermedades se manifiestan distinto, los medicamentos actúan diferente y varios
-          problemas suelen aparecer al mismo tiempo. El geriatra está formado para ver todo eso en conjunto.
-        </p>
+        <div>
+          <p class="text-lg text-muted">
+            Así como el pediatra se especializa en los niños, el geriatra se especializa en las personas mayores. Con la
+            edad, el cuerpo cambia: las enfermedades se manifiestan distinto, los medicamentos actúan diferente y varios
+            problemas suelen aparecer al mismo tiempo. El geriatra está formado para ver todo eso en conjunto.
+          </p>
+          <a href="/blog/que-es-un-geriatra-y-cuando-consultarlo/" class="link mt-4 inline-block text-base">
+            Leer la guía: ¿qué es un geriatra y cuándo consultarlo?
+          </a>
+        </div>
       </div>
 
       <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -489,11 +489,11 @@ const quickTopics = ['Memoria', 'Caídas', 'Medicamentos', 'Enfermedades crónic
       <div class="mt-4 flex flex-col items-start justify-between gap-5 rounded-[1.75rem] border border-line bg-white p-6 sm:flex-row sm:items-center sm:p-8">
         <div>
           <p class="text-xl font-bold sm:text-2xl">¿No sabe qué tipo de consulta necesita?</p>
-          <p class="mt-1 text-base text-ink/75">Escríbame, cuénteme brevemente la situación y le oriento.</p>
+          <p class="mt-1 text-base text-ink/75">Agende una valoración geriátrica integral: ahí revisamos todo y definimos juntos el plan.</p>
         </div>
-        <a href={site.whatsapp.href} target="_blank" rel="noopener" class="btn btn-whatsapp w-full sm:w-auto">
-          <WhatsAppIcon />
-          Preguntar por WhatsApp
+        <a href="#agendar" class="btn btn-primary w-full sm:w-auto">
+          <CalendarCheck aria-hidden="true" />
+          Agendar cita
         </a>
       </div>
     </div>
@@ -688,7 +688,7 @@ const quickTopics = ['Memoria', 'Caídas', 'Medicamentos', 'Enfermedades crónic
         <a href="/blog/" class="link text-base">Ver todos los artículos</a>
       </div>
       <div class="mt-10 grid gap-4 md:grid-cols-3">
-        {posts.map((p, i) => <PostCard post={p} index={i} />)}
+        {posts.map((p) => <PostCard post={p} />)}
       </div>
     </div>
   </section>
@@ -699,17 +699,13 @@ const quickTopics = ['Memoria', 'Caídas', 'Medicamentos', 'Enfermedades crónic
       <div class="lg:sticky lg:top-28 lg:self-start">
         <p class="eyebrow">Preguntas frecuentes</p>
         <h2 class="section-title mt-4">Resolvemos sus dudas</h2>
-        <p class="mt-4 text-lg text-muted">¿Tiene otra pregunta? Con gusto le respondo.</p>
-        <div class="mt-6 flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
-          <a href={site.whatsapp.href} target="_blank" rel="noopener" class="btn btn-whatsapp">
-            <WhatsAppIcon />
-            WhatsApp
-          </a>
-          <a href={site.phone.href} class="btn btn-outline">
-            <Phone aria-hidden="true" />
-            Llamar
-          </a>
-        </div>
+        <p class="mt-4 text-lg text-muted">
+          ¿Tiene otra pregunta? Escríbame a <a href={`mailto:${site.email}`} class="link">{site.email}</a>.
+        </p>
+        <a href="#agendar" class="btn btn-primary mt-6">
+          <CalendarCheck aria-hidden="true" />
+          Agendar cita
+        </a>
       </div>
 
       <div class="space-y-3">
@@ -738,8 +734,8 @@ const quickTopics = ['Memoria', 'Caídas', 'Medicamentos', 'Enfermedades crónic
         <p class="eyebrow">Agendar cita</p>
         <h2 class="section-title mt-4">Dé el primer <Underline>paso</Underline> hoy</h2>
         <p class="mt-4 text-lg text-ink/75">
-          Elija el horario que le convenga en el calendario o, si lo prefiere, escríbame o llámeme y con gusto le ayudo a
-          agendar.
+          Elija en el calendario el día y la hora que mejor le acomoden. Puede agendar usted en nombre de su
+          familiar.
         </p>
       </div>
 
@@ -759,15 +755,12 @@ const quickTopics = ['Memoria', 'Caídas', 'Medicamentos', 'Enfermedades crónic
 
         <div class="flex flex-col gap-4">
           <div class="rounded-[1.75rem] bg-white p-6 sm:p-8">
-            <h3 class="text-xl">¿Prefiere hablar con nosotros?</h3>
+            <h3 class="text-xl">¿No ve el calendario?</h3>
+            <p class="mt-2 text-base text-muted">También puede reservar directamente en mi perfil de Doctoralia.</p>
             <div class="mt-5 grid gap-3">
-              <a href={site.whatsapp.href} target="_blank" rel="noopener" class="btn btn-whatsapp w-full">
-                <WhatsAppIcon />
-                Escribir por WhatsApp
-              </a>
-              <a href={site.phone.href} class="btn btn-outline w-full">
-                <Phone aria-hidden="true" />
-                Llamar al {site.phone.display}
+              <a href={site.doctoralia.url} target="_blank" rel="noopener" class="btn btn-primary w-full">
+                <CalendarCheck aria-hidden="true" />
+                Agendar en Doctoralia
               </a>
               <a href={`mailto:${site.email}`} class="inline-flex items-center justify-center gap-2 py-2 text-base font-semibold text-ink hover:text-brand-700">
                 <Mail class="size-5" aria-hidden="true" />

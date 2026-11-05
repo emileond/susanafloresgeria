@@ -1,6 +1,5 @@
 ---
 import CalendarCheck from '@lucide/astro/icons/calendar-check';
-import Phone from '@lucide/astro/icons/phone';
 import Menu from '@lucide/astro/icons/menu';
 import X from '@lucide/astro/icons/x';
 import { site, nav } from '../config/site';
@@ -31,10 +30,6 @@ import { site, nav } from '../config/site';
     </nav>
 
     <div class="flex items-center gap-2">
-      <a href={site.phone.href} class="hidden items-center gap-2 px-2 font-semibold whitespace-nowrap text-ink hover:underline 2xl:inline-flex">
-        <Phone class="size-5" aria-hidden="true" />
-        {site.phone.display}
-      </a>
       <a href="/#agendar" class="btn btn-primary hidden sm:inline-flex">
         <CalendarCheck aria-hidden="true" />
         Agendar cita
@@ -68,10 +63,6 @@ import { site, nav } from '../config/site';
         <a href="/#agendar" class="btn btn-primary w-full" data-menu-link>
           <CalendarCheck aria-hidden="true" />
           Agendar cita
-        </a>
-        <a href={site.phone.href} class="btn btn-outline w-full">
-          <Phone aria-hidden="true" />
-          Llamar al {site.phone.display}
         </a>
       </li>
     </ul>

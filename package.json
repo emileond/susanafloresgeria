@@ -13,7 +13,6 @@
     "@astrojs/sitemap": "^3.7.4",
     "@fontsource-variable/figtree": "^5.3.0",
     "@lucide/astro": "^1.68.0",
-    "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.3.4",
     "astro": "^7.4.5",
     "sharp": "^0.35.5",

@@ -16,7 +16,7 @@ Sitio estático construido con [Astro](https://astro.build) + Tailwind CSS. Gene
 
 ## Dónde cambiar las cosas
 
-- **Teléfono, WhatsApp, correo, dirección, horarios, precios y cédulas:** `src/config/site.ts`. Todo el sitio toma los datos de ahí.
+- **Correo, dirección, horarios, perfil de Doctoralia y cédulas:** `src/config/site.ts`. Todo el sitio toma los datos de ahí.
 - **Textos de la página principal** (servicios, pasos, testimonios, preguntas frecuentes): `src/pages/index.astro`. Cada sección está separada con un comentario.
 - **Colores y tipografías:** `src/styles/global.css`.
 - **Foto:** `src/assets/headshot.png`. Astro la optimiza automáticamente (WebP, varios tamaños).
@@ -29,9 +29,21 @@ Los artículos se escriben en archivos Markdown con frontmatter en `src/content/
 ```
 ---
 slug: mi-primer-post
-title: "Título del artículo"
-date: 2026-01-03
+title: "Título del artículo (50–65 caracteres)"
+description: "Descripción para Google, 140–160 caracteres."
 excerpt: "Resumen corto para la tarjeta del blog."
+date: 2026-01-03
+updated: 2026-02-10            # opcional: fecha de la última revisión
+category: "Memoria"            # Geriatría | Memoria | Caídas y movilidad | Medicamentos | Cuidadores | Salud general | Cuidados paliativos
+summary:                       # opcional: recuadro "En resumen"
+  - "Punto clave 1"
+  - "Punto clave 2"
+faqs:                          # opcional: preguntas al final (también se envían a Google)
+  - q: "¿Pregunta?"
+    a: "Respuesta breve."
+cta:                           # opcional: texto del bloque para agendar
+  title: "Título del llamado a la acción"
+  text: "Texto breve."
 ---
 
 Contenido en Markdown...
@@ -39,5 +51,7 @@ Contenido en Markdown...
 
 - Listado: `/blog/` · Detalle: `/blog/{slug}/`
 - Use un `slug` en minúsculas, con guiones y sin acentos.
-- Cada artículo muestra automáticamente un bloque para agendar cita y artículos relacionados.
+- Use `##` para las secciones principales: aparecen automáticamente en el índice "En este artículo".
+- Para un recuadro destacado, escriba una cita que empiece en negritas: `> **Consejo:** texto…`
+- Cada artículo muestra automáticamente: autora, preguntas frecuentes, bloque para agendar cita y artículos relacionados.
 - El contenido soporta listas, encabezados, tablas y enlaces (GFM).

@@ -1,7 +1,5 @@
 ---
 import CalendarCheck from '@lucide/astro/icons/calendar-check';
-import WhatsAppIcon from './WhatsAppIcon.astro';
-import { site } from '../config/site';
 
 interface Props {
   title?: string;
@@ -24,10 +22,6 @@ const {
       <a href="/#agendar" class="btn btn-primary">
         <CalendarCheck aria-hidden="true" />
         Agendar cita
-      </a>
-      <a href={site.whatsapp.href} target="_blank" rel="noopener" class="btn btn-whatsapp">
-        <WhatsAppIcon />
-        WhatsApp
       </a>
     </div>
   </div>

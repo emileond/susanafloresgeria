@@ -1,15 +1,13 @@
 /**
  * Datos del sitio en un solo lugar.
- * Cambie aquí teléfonos, horarios, precios, etc. y se actualizan en todas las páginas.
+ * Cambie aquí correo, horarios, dirección, etc. y se actualizan en todas las páginas.
  *
+ * Las citas se agendan únicamente a través de Doctoralia (no se muestran teléfono ni WhatsApp).
  * ⚠️  Los valores marcados con TODO son provisionales y deben confirmarse antes de publicar.
  */
 
-const whatsappNumber = '525555555555'; // TODO: número real de WhatsApp (formato 52 + 10 dígitos, sin espacios)
-const whatsappMessage = 'Hola Dra. Flores, me gustaría agendar una cita para mi familiar.';
-
 export const site = {
-  url: 'https://www.susanaflores.mx', // TODO: confirmar dominio definitivo (se usa para SEO y sitemap)
+  url: 'https://susanafloresgeria.com', // TODO: confirmar dominio definitivo (se usa para SEO y sitemap)
   name: 'Dra. Susana Flores Alonso',
   shortName: 'Dra. Susana Flores',
   specialty: 'Geriatra',
@@ -18,15 +16,7 @@ export const site = {
   description:
     'Geriatra en León, Gto. Atención integral para personas mayores: memoria y demencias, caídas, revisión de medicamentos, enfermedades crónicas y cuidados paliativos. Consulta en consultorio, a domicilio y en línea.',
 
-  phone: {
-    display: '55 5555 5555', // TODO: teléfono real del consultorio
-    href: 'tel:+525555555555', // TODO
-  },
-  whatsapp: {
-    number: whatsappNumber,
-    href: `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`,
-  },
-  email: 'contacto@susanaflores.mx', // TODO: confirmar correo
+  email: 'contacto@susanafloresgeria.com',
 
   doctoralia: {
     url: 'https://www.doctoralia.com.mx/susana-flores-alonso/geriatra/leon',

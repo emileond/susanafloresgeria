@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@plugin "@tailwindcss/typography";
 
 @import "@fontsource-variable/figtree";
 
@@ -31,8 +30,6 @@
   /* Único acento cálido (naranja), usado con moderación (subrayados y un par de formas) */
   --color-accent: #f47d31;
 
-  --color-whatsapp: #128c4b;
-  --color-whatsapp-dark: #0e7340;
 }
 
 @layer base {
@@ -113,9 +110,6 @@
   .btn-dark {
     @apply bg-ink text-white hover:bg-ink/85;
   }
-  .btn-whatsapp {
-    @apply bg-whatsapp text-white hover:bg-whatsapp-dark;
-  }
   .btn-outline {
     @apply border-2 border-ink/15 bg-white text-ink hover:border-ink/30;
   }
@@ -145,5 +139,88 @@
 
   .link {
     @apply font-semibold text-brand-700 underline decoration-brand-300 decoration-2 underline-offset-4 hover:decoration-brand-700;
+  }
+}
+
+/* ===== Artículos del blog: tipografía pensada para lectura cómoda ===== */
+@layer components {
+  .article-body {
+    @apply text-[1.1875rem] leading-[1.8] text-ink/85 sm:text-[1.25rem];
+  }
+  .article-body > * + * {
+    margin-top: 1.25em;
+  }
+  .article-body h2 {
+    @apply mt-14 mb-0 scroll-mt-28 text-[1.65rem] leading-tight text-ink sm:text-[2rem];
+  }
+  .article-body h3 {
+    @apply mt-10 scroll-mt-28 text-[1.3rem] leading-snug text-ink sm:text-[1.45rem];
+  }
+  .article-body h2 + *,
+  .article-body h3 + * {
+    margin-top: 0.75em;
+  }
+  .article-body strong {
+    @apply font-semibold text-ink;
+  }
+  .article-body a {
+    @apply font-semibold text-brand-700 underline decoration-brand-300 decoration-2 underline-offset-4 hover:decoration-brand-700;
+  }
+  .article-body ul,
+  .article-body ol {
+    @apply space-y-2.5 pl-6;
+  }
+  .article-body ul {
+    list-style: disc;
+  }
+  .article-body ol {
+    list-style: decimal;
+  }
+  .article-body li {
+    @apply pl-1.5;
+  }
+  .article-body li::marker {
+    @apply font-semibold text-brand-500;
+  }
+  .article-body li > ul,
+  .article-body li > ol {
+    @apply mt-2.5;
+  }
+  /* Recuadros "Consejo:" / "Importante:" escritos como citas en Markdown */
+  .article-body blockquote {
+    @apply rounded-2xl border-l-4 border-brand-500 bg-brand-50 px-5 py-4 text-ink/90 sm:px-6 sm:py-5;
+  }
+  .article-body blockquote > * + * {
+    margin-top: 0.75em;
+  }
+  .article-body blockquote strong:first-child {
+    @apply text-brand-700;
+  }
+  .article-body table {
+    @apply block w-full max-w-full overflow-x-auto rounded-2xl border border-line text-left text-base;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .article-body thead th {
+    @apply bg-mist px-4 py-3 font-semibold text-ink;
+  }
+  .article-body th,
+  .article-body td {
+    min-width: 11rem;
+  }
+  .article-body td {
+    @apply border-t border-line px-4 py-3 align-top;
+  }
+  .article-body hr {
+    @apply my-12 border-line;
+  }
+}
+
+@layer components {
+  .filter-chip {
+    @apply cursor-pointer rounded-full border border-line bg-white px-4 py-2 text-base font-semibold text-ink/80 transition-colors hover:border-ink/25;
+  }
+  .filter-chip[aria-pressed="true"] {
+    @apply border-ink bg-ink text-white;
   }
 }
