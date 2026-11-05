@@ -1,8 +1,8 @@
 # Expedientes — app clínica privada
 
-App para que la Dra. Flores (y en el futuro su equipo) lleve el expediente de sus pacientes: alta rápida, ficha de identificación, cuidadores, notas clínicas (SOAP) con firma, historia clínica versionada (con asistencia opcional de IA), escalas geriátricas, archivos (estudios, fotos, recetas) y lista de medicamentos.
+App para que la Dra. Flores (y en el futuro su equipo) lleve el expediente de sus pacientes: alta rápida, ficha de identificación, cuidadores, notas clínicas (SOAP) con firma, historia clínica versionada (con asistencia opcional de IA), escalas geriátricas, archivos (estudios, fotos, recetas), lista de medicamentos y agenda (citas propias + citas de Doctoralia).
 
-**Stack (solo Cloudflare):** Vite + React 19 + TanStack Router/Query (interfaz) · Hono en Workers (API) · D1 + Drizzle (datos) · R2 (archivos) · Cloudflare Access (inicio de sesión con Google).
+**Stack (solo Cloudflare):** Vite + React 19 + TanStack Router/Query (interfaz) · Hono en Workers (API) · D1 + Drizzle (datos) · R2 (archivos y respaldos) · Cron Triggers (sincronización y respaldo) · Cloudflare Access (inicio de sesión con Google).
 
 ```
 src/client/   interfaz React (rutas en src/client/routes)
@@ -77,9 +77,41 @@ En *Historia clínica → Completar con IA*, la doctora elige notas y el modelo 
 - Activación: `npx wrangler secret put ANTHROPIC_API_KEY` y, recomendado, una **AI Gateway** de Cloudflare (`AI_GATEWAY_URL = https://gateway.ai.cloudflare.com/v1/<ACCOUNT_ID>/<GATEWAY>/anthropic`) con registro de cuerpos desactivado y límite de gasto.
 - Actualice el aviso de privacidad para mencionar el uso de un encargado de tratamiento (proveedor de IA).
 
+## Agenda y citas de Doctoralia
+
+Vistas de día, semana y lista. Las citas **propias** (agendadas en la app) se crean, mueven y eliminan libremente; también sirven para bloquear horarios (cita sin paciente, solo con título). La doctora y sus asistentes pueden manejar la agenda.
+
+Las citas de **Doctoralia** llegan por la dirección iCal privada de un calendario (no se guarda ninguna contraseña de Doctoralia):
+
+1. En Doctoralia, active la sincronización con Google Calendar (*Configuración → Calendario → Sincronización*, según su plan).
+2. En Google Calendar, abra la configuración de ese calendario y copie la **dirección secreta en formato iCal**.
+3. Guárdela como secreto del Worker:
+   ```bash
+   npx wrangler secret put DOCTORALIA_ICS_URL -c apps/app/wrangler.jsonc
+   ```
+4. Opcional: `DOCTORALIA_CALENDAR_URL` en `wrangler.jsonc` es el enlace de «Abrir en Doctoralia» cuando el evento no trae uno propio (p. ej. la URL de su calendario en Doctoralia).
+
+Cada 15 minutos (cron `*/15 * * * *`) se lee el calendario (30 días atrás y 180 adelante) y se actualizan las citas por su UID. También hay un botón «Sincronizar» en la agenda. En la app esas citas son de **solo lectura** en horario: se pueden vincular a un expediente, marcar como atendidas o «no asistió» y agregar notas; los cambios de horario y las cancelaciones se hacen en Doctoralia. Si una cita futura desaparece del calendario, se marca como cancelada. El paciente se vincula solo si el nombre del evento coincide con **un único** expediente.
+
+## Respaldos
+
+Cada noche (cron `0 9 * * *`, 3:00 a. m. en León) se guarda una copia de cada tabla de D1 en el bucket `susanafloresgeria-backups`, en `d1/AAAA-MM-DD/<tabla>.json.gz`, con un `manifest.json`. Se conservan 35 días; además, D1 tiene *Time Travel* de 30 días (`npx wrangler d1 time-travel restore DB --timestamp=…`).
+
+**Restaurar desde un respaldo de R2:**
+
+```bash
+# 1. Descargue la carpeta del día (panel de R2 o wrangler r2 object get …) a ./respaldo/
+# 2. Genere el SQL
+node apps/app/scripts/restore-backup.mjs ./respaldo > restore.sql
+# 3. Aplíquelo a una base NUEVA con las migraciones ya aplicadas
+npx wrangler d1 execute DB --remote --file=restore.sql -c apps/app/wrangler.jsonc
+```
+
+Pruebe la restauración en una base de prueba al menos una vez al año.
+
 ## Buenas prácticas incluidas
 
-- **Doble verificación de sesión:** Access protege el dominio y la API además verifica la firma del JWT en cada petición. Los roles se aplican en el servidor: `doctor`/`admin` ven lo clínico; `assistant` solo datos de identificación.
+- **Doble verificación de sesión:** Access protege el dominio y la API además verifica la firma del JWT en cada petición. Los roles se aplican en el servidor: `doctor`/`admin` ven lo clínico; `assistant` solo datos de identificación y la agenda.
 - **Notas firmadas inmutables:** se bloquean en la API y con un *trigger* en la base de datos; las correcciones se hacen con **adenda**. Los borradores se pueden descartar.
 - **Historia clínica versionada:** cada guardado crea una versión nueva; las anteriores no se modifican.
 - **Nada se borra del expediente:** pacientes y archivos se **archivan** (NOM-004: conservar al menos 5 años).

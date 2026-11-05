@@ -43,6 +43,13 @@
       "when": 1793851892617,
       "tag": "0005_prescriptions_immutable",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1793852995977,
+      "tag": "0006_agenda",
+      "breakpoints": true
     }
   ]
 }

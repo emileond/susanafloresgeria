@@ -224,6 +224,52 @@ export const prescriptions = sqliteTable(
   (t) => [index('prescriptions_patient_idx').on(t.patientId, t.date), uniqueIndex('prescriptions_folio_unique').on(t.folio)],
 );
 
+/**
+ * Citas de la agenda. `direct`: las agenda la doctora en la app (editables).
+ * `doctoralia`: vienen del calendario sincronizado (solo lectura salvo vincular paciente).
+ */
+export const appointments = sqliteTable(
+  'appointments',
+  {
+    id: id(),
+    patientId: text('patient_id').references(() => patients.id),
+    source: text('source', { enum: ['direct', 'doctoralia'] }).notNull(),
+    /** UID del evento en el calendario externo (para sincronizar). */
+    externalUid: text('external_uid'),
+    externalUrl: text('external_url'),
+    title: text('title'),
+    startsAt: integer('starts_at', { mode: 'timestamp_ms' }).notNull(),
+    endsAt: integer('ends_at', { mode: 'timestamp_ms' }).notNull(),
+    modality: text('modality', { enum: ['consultorio', 'domicilio', 'en_linea'] }).notNull().default('consultorio'),
+    status: text('status', { enum: ['scheduled', 'done', 'cancelled', 'no_show'] }).notNull().default('scheduled'),
+    notes: text('notes'),
+    ...timestamps,
+    ...authorship,
+  },
+  (t) => [
+    index('appointments_starts_idx').on(t.startsAt),
+    index('appointments_patient_idx').on(t.patientId, t.startsAt),
+    uniqueIndex('appointments_external_unique').on(t.source, t.externalUid),
+  ],
+);
+
+/** Registro de cada sincronización del calendario externo. */
+export const syncRuns = sqliteTable(
+  'sync_runs',
+  {
+    id: id(),
+    source: text('source').notNull(),
+    startedAt: integer('started_at', { mode: 'timestamp_ms' }).notNull(),
+    finishedAt: integer('finished_at', { mode: 'timestamp_ms' }),
+    status: text('status', { enum: ['ok', 'error'] }).notNull(),
+    added: integer('added').notNull().default(0),
+    updated: integer('updated').notNull().default(0),
+    cancelled: integer('cancelled').notNull().default(0),
+    message: text('message'),
+  },
+  (t) => [index('sync_runs_started_idx').on(t.source, t.startedAt)],
+);
+
 /** Bitácora de accesos y cambios (NOM-024): quién, qué, cuándo. Nunca guarda contenido clínico. */
 export const auditLog = sqliteTable(
   'audit_log',
@@ -252,3 +298,4 @@ export type FileRecord = typeof files.$inferSelect;
 export type Medication = typeof medications.$inferSelect;
 export type Assessment = typeof assessments.$inferSelect;
 export type Prescription = typeof prescriptions.$inferSelect;
+export type Appointment = typeof appointments.$inferSelect;

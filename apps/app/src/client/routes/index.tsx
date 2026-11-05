@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { CalendarDays, FilePen, Plus, Search, Users } from 'lucide-react';
-import { NOTE_TYPE_LABELS } from '../../shared/constants';
+import { MODALITY_LABELS, NOTE_TYPE_LABELS } from '../../shared/constants';
+import { hhmm, zonedParts } from '../../shared/time';
+import { STATUS_LABELS } from '../components/agenda/AppointmentDialog';
 import { formatDate, todayISO } from '../../shared/format';
 import { useUi } from '../components/AppShell';
 import { PatientRow } from '../components/PatientRow';
@@ -63,6 +65,53 @@ function Home() {
         </div>
       ) : (
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.4fr_1fr]">
+          <section aria-labelledby="hoy" className="lg:col-span-2">
+            <div className="flex items-center justify-between">
+              <h2 id="hoy" className="section-heading">
+                Citas de hoy
+              </h2>
+              <Link to="/agenda" search={{ vista: 'dia' }} className="text-sm font-semibold text-brand-700 hover:underline">
+                Ver agenda
+              </Link>
+            </div>
+            {dash.data.todayAppointments.length ? (
+              <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {dash.data.todayAppointments.map((a) => {
+                  const s = zonedParts(a.startsAt);
+                  const past = Date.parse(a.endsAt) < Date.now();
+                  const inner = (
+                    <>
+                      <span className={`text-lg font-bold tabular-nums ${a.status === 'cancelled' ? 'text-muted line-through' : ''}`}>{hhmm(s.hour, s.minute)}</span>
+                      <span className="min-w-0">
+                        <span className={`block truncate font-semibold ${a.status === 'cancelled' ? 'text-muted line-through' : ''}`}>{a.patientName ?? a.title ?? 'Cita'}</span>
+                        <span className="block text-xs text-muted">
+                          {MODALITY_LABELS[a.modality]} · {a.source === 'doctoralia' ? 'Doctoralia' : 'Agendada aquí'}
+                          {a.status !== 'scheduled' ? ` · ${STATUS_LABELS[a.status]}` : ''}
+                        </span>
+                      </span>
+                    </>
+                  );
+                  const cls = `flex items-center gap-3 rounded-2xl border-l-4 bg-white px-4 py-3 ring-1 ring-line ${a.source === 'doctoralia' ? 'border-teal-500' : 'border-brand-600'} ${past ? 'opacity-60' : ''}`;
+                  return (
+                    <li key={a.id}>
+                      {a.patientId ? (
+                        <Link to="/pacientes/$patientId" params={{ patientId: a.patientId }} className={`${cls} hover:bg-mist/60`}>
+                          {inner}
+                        </Link>
+                      ) : (
+                        <Link to="/agenda" search={{ vista: 'dia' }} className={`${cls} hover:bg-mist/60`}>
+                          {inner}
+                        </Link>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="mt-3 rounded-2xl border border-dashed border-line px-5 py-6 text-center text-sm text-muted">No hay citas para hoy.</p>
+            )}
+          </section>
+
           <section aria-labelledby="recent">
             <div className="flex items-center justify-between">
               <h2 id="recent" className="section-heading">

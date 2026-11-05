@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
+  AppointmentInput,
+  AppointmentUpdateInput,
   AssessmentInput,
   ContactInput,
   HistoryInput,
@@ -12,6 +14,8 @@ import type {
 } from '../../shared/schemas';
 import type {
   AiHistoryDraft,
+  AppointmentItem,
+  SyncStatus,
   AssessmentItem,
   Dashboard,
   FileItem,
@@ -39,6 +43,9 @@ export const qk = {
   assessments: (patientId: string) => ['patient', patientId, 'assessments'] as const,
   prescriptions: (patientId: string) => ['patient', patientId, 'prescriptions'] as const,
   prescription: (id: string) => ['prescription', id] as const,
+  appointments: (from: string, to: string) => ['appointments', from, to] as const,
+  patientAppointments: (patientId: string) => ['appointments', 'patient', patientId] as const,
+  syncStatus: ['appointments', 'sync-status'] as const,
 };
 
 export const useMe = () => useQuery({ queryKey: qk.me, queryFn: () => api<Me>('/me'), staleTime: 5 * 60_000 });
@@ -259,3 +266,34 @@ export function usePrescriptionMutations(patientId: string) {
 
 /** Registra en la bitácora que se imprimió o exportó la receta (no bloquea la impresión). */
 export const logPrescriptionPrinted = (id: string) => api(`/prescriptions/${id}/printed`, { method: 'POST' }).catch(() => undefined);
+
+// Agenda
+export const useAppointments = (from: string, to: string) =>
+  useQuery({
+    queryKey: qk.appointments(from, to),
+    queryFn: () => api<AppointmentItem[]>(`/appointments?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`),
+    placeholderData: (prev) => prev,
+    refetchInterval: 5 * 60_000,
+  });
+
+export const usePatientAppointments = (patientId: string) =>
+  useQuery({ queryKey: qk.patientAppointments(patientId), enabled: !!patientId, queryFn: () => api<AppointmentItem[]>(`/appointments/patient/${patientId}`) });
+
+export const useSyncStatus = () => useQuery({ queryKey: qk.syncStatus, queryFn: () => api<SyncStatus>('/appointments/sync-status'), refetchInterval: 5 * 60_000 });
+
+export function useAppointmentMutations() {
+  const qc = useQueryClient();
+  const refresh = () => {
+    void qc.invalidateQueries({ queryKey: ['appointments'] });
+    void qc.invalidateQueries({ queryKey: qk.dashboard });
+  };
+  return {
+    create: useMutation({ mutationFn: (input: AppointmentInput) => api<AppointmentItem>('/appointments', { method: 'POST', json: input }), onSuccess: refresh }),
+    update: useMutation({
+      mutationFn: ({ id, ...input }: AppointmentUpdateInput & { id: string }) => api<AppointmentItem>(`/appointments/${id}`, { method: 'PATCH', json: input }),
+      onSuccess: refresh,
+    }),
+    remove: useMutation({ mutationFn: (id: string) => api(`/appointments/${id}`, { method: 'DELETE' }), onSuccess: refresh }),
+    sync: useMutation({ mutationFn: () => api<{ status: string; added: number; updated: number; cancelled: number; message?: string }>('/appointments/sync', { method: 'POST' }), onSuccess: refresh }),
+  };
+}

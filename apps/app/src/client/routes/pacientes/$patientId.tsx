@@ -138,7 +138,7 @@ function PatientLayout() {
                 <Upload aria-hidden /> <span className="sm:hidden">Archivo</span>
                 <span className="hidden sm:inline">Subir archivo</span>
               </Link>
-              <Link to="/agenda" className={actionClass}>
+              <Link to="/agenda" search={{ nuevo: patientId }} className={actionClass}>
                 <CalendarPlus aria-hidden /> Agendar
               </Link>
             </div>

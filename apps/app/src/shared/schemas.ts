@@ -176,3 +176,37 @@ export const prescriptionCancelInput = z.object({
 export const aiHistoryDraftInput = z.object({
   noteIds: z.array(z.uuid()).min(1, 'Seleccione al menos una nota').max(30),
 });
+
+const isoDateTime = z.iso.datetime({ offset: true });
+export const APPOINTMENT_STATUSES = ['scheduled', 'done', 'cancelled', 'no_show'] as const;
+
+/** Cita directa (agendada en la app). */
+export const appointmentInput = z
+  .object({
+    patientId: z.uuid().nullable().optional(),
+    title: optionalText(160),
+    startsAt: isoDateTime,
+    endsAt: isoDateTime,
+    modality: z.enum(MODALITIES).default('consultorio'),
+    status: z.enum(APPOINTMENT_STATUSES).default('scheduled'),
+    notes: optionalText(1000),
+  })
+  .refine((v) => Date.parse(v.endsAt) > Date.parse(v.startsAt), { message: 'La hora de fin debe ser posterior al inicio', path: ['endsAt'] })
+  .refine((v) => Date.parse(v.endsAt) - Date.parse(v.startsAt) <= 12 * 3600_000, { message: 'La cita no puede durar más de 12 horas', path: ['endsAt'] })
+  .refine((v) => Boolean(v.patientId) || Boolean(v.title), { message: 'Elija un paciente o escriba un título', path: ['title'] });
+export type AppointmentInput = z.input<typeof appointmentInput>;
+
+export const appointmentUpdateInput = z.object({
+  patientId: z.uuid().nullable().optional(),
+  title: optionalText(160),
+  startsAt: isoDateTime.optional(),
+  endsAt: isoDateTime.optional(),
+  modality: z.enum(MODALITIES).optional(),
+  status: z.enum(APPOINTMENT_STATUSES).optional(),
+  notes: optionalText(1000),
+});
+export type AppointmentUpdateInput = z.input<typeof appointmentUpdateInput>;
+
+export const appointmentRangeQuery = z
+  .object({ from: isoDateTime, to: isoDateTime })
+  .refine((v) => Date.parse(v.to) > Date.parse(v.from) && Date.parse(v.to) - Date.parse(v.from) <= 92 * 24 * 3600_000, 'Rango inválido');

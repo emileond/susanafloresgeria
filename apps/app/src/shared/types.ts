@@ -117,6 +117,7 @@ export interface MedicationItem {
 
 export interface Dashboard {
   totals: { patients: number; draftNotes: number };
+  todayAppointments: AppointmentItem[];
   recentPatients: PatientListItem[];
   draftNotes: { id: string; patientId: string; patientName: string; visitDate: string; type: NoteType }[];
 }
@@ -200,4 +201,25 @@ export interface AiHistoryDraft {
   proposals: Partial<Record<string, string>>;
   notesUsed: number;
   model: string;
+}
+
+export type AppointmentStatus = 'scheduled' | 'done' | 'cancelled' | 'no_show';
+
+export interface AppointmentItem {
+  id: string;
+  source: 'direct' | 'doctoralia';
+  patientId: string | null;
+  patientName: string | null;
+  title: string | null;
+  startsAt: string;
+  endsAt: string;
+  modality: 'consultorio' | 'domicilio' | 'en_linea';
+  status: AppointmentStatus;
+  notes: string | null;
+  externalUrl: string | null;
+}
+
+export interface SyncStatus {
+  configured: boolean;
+  lastRun: { status: 'ok' | 'error'; finishedAt: string | null; added: number; updated: number; cancelled: number; message: string | null } | null;
 }
