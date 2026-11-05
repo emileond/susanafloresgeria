@@ -1,0 +1,17 @@
+{
+  // Sitio público (Astro, estático) servido como Worker con archivos estáticos.
+  // Despliegue: `npm run deploy:web` desde la raíz (compila y publica).
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "susanafloresgeria-web",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    // Muestra la página 404 de Astro para rutas inexistentes
+    "not_found_handling": "404-page",
+    // /blog/mi-articulo → /blog/mi-articulo/ (coincide con las URL del sitemap)
+    "html_handling": "auto-trailing-slash"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

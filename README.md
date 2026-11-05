@@ -36,6 +36,17 @@ Agregue `"@susanafloresgeria/theme": "*"` a las dependencias del proyecto. Un ca
 
 ## Despliegue
 
-Cada app se despliega por separado en Cloudflare desde este mismo repositorio, indicando su carpeta (`apps/web`, `apps/app`) como raíz del proyecto. Así, un cambio en el blog no vuelve a desplegar la app de expedientes y viceversa.
+Cada app es su propio Worker de Cloudflare, desplegado desde este mismo repositorio. Así, un cambio en el blog no vuelve a desplegar la app de expedientes y viceversa.
+
+**Sitio web** (`apps/web/wrangler.jsonc`, Worker `susanafloresgeria-web`), con Workers Builds conectado a GitHub:
+
+| Ajuste | Valor |
+| --- | --- |
+| Root directory | *(raíz del repositorio)* |
+| Build command | `npm run build:web` |
+| Deploy command | `npx wrangler deploy -c apps/web/wrangler.jsonc` |
+| Build watch paths | `apps/web/*`, `packages/theme/*` |
+
+Despliegue manual desde la computadora: `npm run deploy:web`.
 
 Detalles de cada proyecto en su propio README: [apps/web](apps/web/README.md).

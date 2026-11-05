@@ -12,7 +12,8 @@
     "dev:web": "npm run dev -w @susanafloresgeria/web",
     "build": "npm run build --workspaces --if-present",
     "build:web": "npm run build -w @susanafloresgeria/web",
-    "check": "npm run check --workspaces --if-present"
+    "check": "npm run check --workspaces --if-present",
+    "deploy:web": "npm run build:web && npm run deploy -w @susanafloresgeria/web"
   },
   "engines": {
     "node": ">=22"
