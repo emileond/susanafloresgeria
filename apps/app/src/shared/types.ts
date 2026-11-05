@@ -45,6 +45,8 @@ export interface PatientDetail extends PatientListItem {
     draftNotes: number;
     filesCount: number;
     assessmentsCount: number;
+    /** Recetas emitidas vigentes (no cuenta borradores ni canceladas). */
+    prescriptionsCount: number;
     historyVersion: number | null;
     lastNote: { id: string; visitDate: string; type: NoteType } | null;
   };
@@ -139,6 +141,57 @@ export interface AssessmentItem {
   comment: string | null;
   performedAt: string;
   createdAt: string;
+  createdByName: string | null;
+}
+
+export interface PrescriptionItem {
+  drug: string;
+  brand?: string;
+  presentation?: string;
+  dose?: string;
+  route?: string;
+  frequency?: string;
+  duration?: string;
+  quantity?: string;
+  instructions?: string;
+  medicationId?: string;
+}
+
+/** Datos del paciente y de quien prescribe tal como quedaron impresos al emitir la receta. */
+export interface PrescriptionSnapshot {
+  patient: { fullName: string; birthDate: string; age: number; sex: 'F' | 'M' | 'X'; allergies: string | null };
+  prescriber: {
+    name: string;
+    specialty: string;
+    degrees: { title: string; school: string; cedulaLabel: string; cedula: string }[];
+    address: string[];
+  };
+}
+
+export type PrescriptionStatus = 'draft' | 'issued' | 'cancelled';
+
+export interface Prescription {
+  id: string;
+  patientId: string;
+  noteId: string | null;
+  folio: number | null;
+  date: string;
+  items: PrescriptionItem[];
+  diagnosis: string | null;
+  generalInstructions: string | null;
+  weightKg: number | null;
+  status: PrescriptionStatus;
+  /** Datos impresos tal como quedaron al emitir (null en borradores). */
+  snapshot: PrescriptionSnapshot | null;
+  issuedAt: string | null;
+  issuedByName: string | null;
+  cancelledAt: string | null;
+  cancelledByName: string | null;
+  cancelReason: string | null;
+  sourceId: string | null;
+  sourceFolio: number | null;
+  createdAt: string;
+  updatedAt: string;
   createdByName: string | null;
 }
 

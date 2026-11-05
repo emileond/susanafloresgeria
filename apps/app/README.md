@@ -56,6 +56,18 @@ Definidas en `src/shared/scales/` (ítems en español, puntuación, interpretaci
 
 Incluidas: Katz, Barthel, Lawton-Brody, GDS-15, FRAIL, SARC-F y Tinetti. **MNA-SF y Zarit** tienen derechos de autor y están deshabilitadas: una vez confirmadas sus condiciones de uso, agregue sus claves a `LICENSED_SCALES` (p. ej. `"mna-sf,zarit"`). La doctora debe revisar la redacción de los ítems contra las versiones validadas en español que utilice.
 
+## Recetas
+
+En *Recetas* (expediente del paciente) la doctora escribe la receta en borrador (con autoguardado), opcionalmente a partir de los medicamentos activos del paciente, y la **emite**. Al emitirse:
+
+- recibe un **folio** consecutivo y se guarda una copia de los datos impresos (paciente, edad, alergias y datos de la doctora), así una reimpresión es idéntica aunque después cambie el expediente;
+- queda **inmutable** (API y *trigger* en la base de datos). Para corregirla se **cancela con motivo** y se emite una nueva a partir de ella; la cancelada sigue en el expediente y se imprime con la marca «CANCELADA»;
+- puede agregar a la lista de medicamentos los que aún no estén activos.
+
+Solo el rol `doctor` emite o cancela (el nombre y las cédulas impresos son los suyos); `admin` puede preparar borradores; `assistant` no ve recetas.
+
+**Impresión / PDF:** la ruta `/recetas/<id>/imprimir` tiene una hoja de impresión (media carta o carta) y el botón «Imprimir / Guardar como PDF» usa el diálogo del navegador. Cada impresión queda en la bitácora. Contenido según el Reglamento de Insumos para la Salud (art. 29–31): nombre, especialidad, institución y cédulas profesional y de especialidad, domicilio del consultorio, fecha, nombre, edad y peso del paciente, denominación genérica (y marca opcional), presentación, dosis, vía, frecuencia y duración, y línea de firma. Los datos de la doctora están en `src/shared/prescriber.ts`. Los estupefacientes y psicotrópicos tienen requisitos adicionales (p. ej. recetario especial con código de barras de COFEPRIS) que esta receta no cubre.
+
 ## Asistente de IA para la historia clínica (opcional)
 
 En *Historia clínica → Completar con IA*, la doctora elige notas y el modelo (`AI_MODEL`, por defecto `claude-haiku-5-5`) propone el texto de cada sección. Ella acepta, edita o descarta sección por sección; solo lo aceptado se guarda como versión nueva marcada «con asistencia de IA».

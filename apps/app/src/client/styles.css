@@ -44,3 +44,21 @@
     @apply text-lg font-bold;
   }
 }
+
+/* Impresión (recetas): solo se imprime el contenido de la página, sin menús ni avisos. */
+@media print {
+  html,
+  body {
+    background: white;
+  }
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  [data-sonner-toaster] {
+    display: none !important;
+  }
+  .rx-item {
+    break-inside: avoid;
+  }
+}

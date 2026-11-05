@@ -11,6 +11,7 @@ import { historyRoutes } from './routes/history';
 import { medicationRoutes, patientMedicationRoutes } from './routes/medications';
 import { noteRoutes, patientNoteRoutes } from './routes/notes';
 import { patientRoutes, toListItem } from './routes/patients';
+import { patientPrescriptionRoutes, prescriptionRoutes } from './routes/prescriptions';
 import { assessmentRoutes, patientAssessmentRoutes } from './routes/assessments';
 import { enabledScales } from '../shared/scales';
 import type { AppEnv } from './types';
@@ -72,10 +73,12 @@ const api = new Hono<AppEnv>()
   .route('/patients/:patientId/files', patientFileRoutes)
   .route('/patients/:patientId/medications', patientMedicationRoutes)
   .route('/patients/:patientId/assessments', patientAssessmentRoutes)
+  .route('/patients/:patientId/prescriptions', patientPrescriptionRoutes)
   .route('/assessments', assessmentRoutes)
   .route('/notes', noteRoutes)
   .route('/files', fileRoutes)
-  .route('/medications', medicationRoutes);
+  .route('/medications', medicationRoutes)
+  .route('/prescriptions', prescriptionRoutes);
 
 const app = new Hono<AppEnv>()
   .route('/api', api)

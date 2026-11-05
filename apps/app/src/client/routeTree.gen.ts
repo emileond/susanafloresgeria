@@ -18,10 +18,13 @@ import { Route as PacientesPatientIdArchivosRouteImport } from './routes/pacient
 import { Route as PacientesPatientIdDatosRouteImport } from './routes/pacientes/$patientId/datos'
 import { Route as PacientesPatientIdHistoriaRouteImport } from './routes/pacientes/$patientId/historia'
 import { Route as PacientesPatientIdMedicamentosRouteImport } from './routes/pacientes/$patientId/medicamentos'
+import { Route as RecetasPrescriptionIdImprimirRouteImport } from './routes/recetas/$prescriptionId/imprimir'
 import { Route as PacientesPatientIdEscalasIndexRouteImport } from './routes/pacientes/$patientId/escalas/index'
 import { Route as PacientesPatientIdEscalasScaleKeyRouteImport } from './routes/pacientes/$patientId/escalas/$scaleKey'
 import { Route as PacientesPatientIdNotasIndexRouteImport } from './routes/pacientes/$patientId/notas/index'
 import { Route as PacientesPatientIdNotasNoteIdRouteImport } from './routes/pacientes/$patientId/notas/$noteId'
+import { Route as PacientesPatientIdRecetasIndexRouteImport } from './routes/pacientes/$patientId/recetas/index'
+import { Route as PacientesPatientIdRecetasPrescriptionIdRouteImport } from './routes/pacientes/$patientId/recetas/$prescriptionId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -71,6 +74,12 @@ const PacientesPatientIdMedicamentosRoute =
     path: '/medicamentos',
     getParentRoute: () => PacientesPatientIdRoute,
   } as any)
+const RecetasPrescriptionIdImprimirRoute =
+  RecetasPrescriptionIdImprimirRouteImport.update({
+    id: '/recetas/$prescriptionId/imprimir',
+    path: '/recetas/$prescriptionId/imprimir',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const PacientesPatientIdEscalasIndexRoute =
   PacientesPatientIdEscalasIndexRouteImport.update({
     id: '/escalas/',
@@ -95,6 +104,18 @@ const PacientesPatientIdNotasNoteIdRoute =
     path: '/notas/$noteId',
     getParentRoute: () => PacientesPatientIdRoute,
   } as any)
+const PacientesPatientIdRecetasIndexRoute =
+  PacientesPatientIdRecetasIndexRouteImport.update({
+    id: '/recetas/',
+    path: '/recetas/',
+    getParentRoute: () => PacientesPatientIdRoute,
+  } as any)
+const PacientesPatientIdRecetasPrescriptionIdRoute =
+  PacientesPatientIdRecetasPrescriptionIdRouteImport.update({
+    id: '/recetas/$prescriptionId',
+    path: '/recetas/$prescriptionId',
+    getParentRoute: () => PacientesPatientIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -105,11 +126,14 @@ export interface FileRoutesByFullPath {
   '/pacientes/$patientId/datos': typeof PacientesPatientIdDatosRoute
   '/pacientes/$patientId/historia': typeof PacientesPatientIdHistoriaRoute
   '/pacientes/$patientId/medicamentos': typeof PacientesPatientIdMedicamentosRoute
+  '/recetas/$prescriptionId/imprimir': typeof RecetasPrescriptionIdImprimirRoute
   '/pacientes/$patientId/': typeof PacientesPatientIdIndexRoute
   '/pacientes/$patientId/escalas/$scaleKey': typeof PacientesPatientIdEscalasScaleKeyRoute
   '/pacientes/$patientId/notas/$noteId': typeof PacientesPatientIdNotasNoteIdRoute
+  '/pacientes/$patientId/recetas/$prescriptionId': typeof PacientesPatientIdRecetasPrescriptionIdRoute
   '/pacientes/$patientId/escalas/': typeof PacientesPatientIdEscalasIndexRoute
   '/pacientes/$patientId/notas/': typeof PacientesPatientIdNotasIndexRoute
+  '/pacientes/$patientId/recetas/': typeof PacientesPatientIdRecetasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -119,11 +143,14 @@ export interface FileRoutesByTo {
   '/pacientes/$patientId/datos': typeof PacientesPatientIdDatosRoute
   '/pacientes/$patientId/historia': typeof PacientesPatientIdHistoriaRoute
   '/pacientes/$patientId/medicamentos': typeof PacientesPatientIdMedicamentosRoute
+  '/recetas/$prescriptionId/imprimir': typeof RecetasPrescriptionIdImprimirRoute
   '/pacientes/$patientId': typeof PacientesPatientIdIndexRoute
   '/pacientes/$patientId/escalas/$scaleKey': typeof PacientesPatientIdEscalasScaleKeyRoute
   '/pacientes/$patientId/notas/$noteId': typeof PacientesPatientIdNotasNoteIdRoute
+  '/pacientes/$patientId/recetas/$prescriptionId': typeof PacientesPatientIdRecetasPrescriptionIdRoute
   '/pacientes/$patientId/escalas': typeof PacientesPatientIdEscalasIndexRoute
   '/pacientes/$patientId/notas': typeof PacientesPatientIdNotasIndexRoute
+  '/pacientes/$patientId/recetas': typeof PacientesPatientIdRecetasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -135,11 +162,14 @@ export interface FileRoutesById {
   '/pacientes/$patientId/datos': typeof PacientesPatientIdDatosRoute
   '/pacientes/$patientId/historia': typeof PacientesPatientIdHistoriaRoute
   '/pacientes/$patientId/medicamentos': typeof PacientesPatientIdMedicamentosRoute
+  '/recetas/$prescriptionId/imprimir': typeof RecetasPrescriptionIdImprimirRoute
   '/pacientes/$patientId/': typeof PacientesPatientIdIndexRoute
   '/pacientes/$patientId/escalas/$scaleKey': typeof PacientesPatientIdEscalasScaleKeyRoute
   '/pacientes/$patientId/notas/$noteId': typeof PacientesPatientIdNotasNoteIdRoute
+  '/pacientes/$patientId/recetas/$prescriptionId': typeof PacientesPatientIdRecetasPrescriptionIdRoute
   '/pacientes/$patientId/escalas/': typeof PacientesPatientIdEscalasIndexRoute
   '/pacientes/$patientId/notas/': typeof PacientesPatientIdNotasIndexRoute
+  '/pacientes/$patientId/recetas/': typeof PacientesPatientIdRecetasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -152,11 +182,14 @@ export interface FileRouteTypes {
     | '/pacientes/$patientId/datos'
     | '/pacientes/$patientId/historia'
     | '/pacientes/$patientId/medicamentos'
+    | '/recetas/$prescriptionId/imprimir'
     | '/pacientes/$patientId/'
     | '/pacientes/$patientId/escalas/$scaleKey'
     | '/pacientes/$patientId/notas/$noteId'
+    | '/pacientes/$patientId/recetas/$prescriptionId'
     | '/pacientes/$patientId/escalas/'
     | '/pacientes/$patientId/notas/'
+    | '/pacientes/$patientId/recetas/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -166,11 +199,14 @@ export interface FileRouteTypes {
     | '/pacientes/$patientId/datos'
     | '/pacientes/$patientId/historia'
     | '/pacientes/$patientId/medicamentos'
+    | '/recetas/$prescriptionId/imprimir'
     | '/pacientes/$patientId'
     | '/pacientes/$patientId/escalas/$scaleKey'
     | '/pacientes/$patientId/notas/$noteId'
+    | '/pacientes/$patientId/recetas/$prescriptionId'
     | '/pacientes/$patientId/escalas'
     | '/pacientes/$patientId/notas'
+    | '/pacientes/$patientId/recetas'
   id:
     | '__root__'
     | '/'
@@ -181,11 +217,14 @@ export interface FileRouteTypes {
     | '/pacientes/$patientId/datos'
     | '/pacientes/$patientId/historia'
     | '/pacientes/$patientId/medicamentos'
+    | '/recetas/$prescriptionId/imprimir'
     | '/pacientes/$patientId/'
     | '/pacientes/$patientId/escalas/$scaleKey'
     | '/pacientes/$patientId/notas/$noteId'
+    | '/pacientes/$patientId/recetas/$prescriptionId'
     | '/pacientes/$patientId/escalas/'
     | '/pacientes/$patientId/notas/'
+    | '/pacientes/$patientId/recetas/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -193,6 +232,7 @@ export interface RootRouteChildren {
   AgendaRoute: typeof AgendaRoute
   PacientesPatientIdRoute: typeof PacientesPatientIdRouteWithChildren
   PacientesIndexRoute: typeof PacientesIndexRoute
+  RecetasPrescriptionIdImprimirRoute: typeof RecetasPrescriptionIdImprimirRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -260,6 +300,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PacientesPatientIdMedicamentosRouteImport
       parentRoute: typeof PacientesPatientIdRoute
     }
+    '/recetas/$prescriptionId/imprimir': {
+      id: '/recetas/$prescriptionId/imprimir'
+      path: '/recetas/$prescriptionId/imprimir'
+      fullPath: '/recetas/$prescriptionId/imprimir'
+      preLoaderRoute: typeof RecetasPrescriptionIdImprimirRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pacientes/$patientId/escalas/': {
       id: '/pacientes/$patientId/escalas/'
       path: '/escalas'
@@ -288,6 +335,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PacientesPatientIdNotasNoteIdRouteImport
       parentRoute: typeof PacientesPatientIdRoute
     }
+    '/pacientes/$patientId/recetas/': {
+      id: '/pacientes/$patientId/recetas/'
+      path: '/recetas'
+      fullPath: '/pacientes/$patientId/recetas/'
+      preLoaderRoute: typeof PacientesPatientIdRecetasIndexRouteImport
+      parentRoute: typeof PacientesPatientIdRoute
+    }
+    '/pacientes/$patientId/recetas/$prescriptionId': {
+      id: '/pacientes/$patientId/recetas/$prescriptionId'
+      path: '/recetas/$prescriptionId'
+      fullPath: '/pacientes/$patientId/recetas/$prescriptionId'
+      preLoaderRoute: typeof PacientesPatientIdRecetasPrescriptionIdRouteImport
+      parentRoute: typeof PacientesPatientIdRoute
+    }
   }
 }
 
@@ -299,8 +360,10 @@ interface PacientesPatientIdRouteChildren {
   PacientesPatientIdIndexRoute: typeof PacientesPatientIdIndexRoute
   PacientesPatientIdEscalasScaleKeyRoute: typeof PacientesPatientIdEscalasScaleKeyRoute
   PacientesPatientIdNotasNoteIdRoute: typeof PacientesPatientIdNotasNoteIdRoute
+  PacientesPatientIdRecetasPrescriptionIdRoute: typeof PacientesPatientIdRecetasPrescriptionIdRoute
   PacientesPatientIdEscalasIndexRoute: typeof PacientesPatientIdEscalasIndexRoute
   PacientesPatientIdNotasIndexRoute: typeof PacientesPatientIdNotasIndexRoute
+  PacientesPatientIdRecetasIndexRoute: typeof PacientesPatientIdRecetasIndexRoute
 }
 
 const PacientesPatientIdRouteChildren: PacientesPatientIdRouteChildren = {
@@ -312,8 +375,11 @@ const PacientesPatientIdRouteChildren: PacientesPatientIdRouteChildren = {
   PacientesPatientIdEscalasScaleKeyRoute:
     PacientesPatientIdEscalasScaleKeyRoute,
   PacientesPatientIdNotasNoteIdRoute: PacientesPatientIdNotasNoteIdRoute,
+  PacientesPatientIdRecetasPrescriptionIdRoute:
+    PacientesPatientIdRecetasPrescriptionIdRoute,
   PacientesPatientIdEscalasIndexRoute: PacientesPatientIdEscalasIndexRoute,
   PacientesPatientIdNotasIndexRoute: PacientesPatientIdNotasIndexRoute,
+  PacientesPatientIdRecetasIndexRoute: PacientesPatientIdRecetasIndexRoute,
 }
 
 const PacientesPatientIdRouteWithChildren =
@@ -324,6 +390,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgendaRoute: AgendaRoute,
   PacientesPatientIdRoute: PacientesPatientIdRouteWithChildren,
   PacientesIndexRoute: PacientesIndexRoute,
+  RecetasPrescriptionIdImprimirRoute: RecetasPrescriptionIdImprimirRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

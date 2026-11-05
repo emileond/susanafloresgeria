@@ -128,6 +128,51 @@ export const assessmentInput = z.object({
 });
 export type AssessmentInput = z.input<typeof assessmentInput>;
 
+/** Un medicamento de la receta. En borrador todo es opcional; al emitir se exigen los campos del art. 30. */
+export const prescriptionItemInput = z.object({
+  drug: trimmed(160),
+  brand: optionalText(120),
+  presentation: optionalText(160),
+  dose: optionalText(120),
+  route: optionalText(60),
+  frequency: optionalText(120),
+  duration: optionalText(120),
+  quantity: optionalText(120),
+  instructions: optionalText(600),
+  medicationId: z.uuid().optional(),
+});
+export type PrescriptionItemInput = z.input<typeof prescriptionItemInput>;
+
+const prescriptionFields = {
+  date: isoDate,
+  noteId: z.uuid().nullable().optional(),
+  items: z.array(prescriptionItemInput).max(20, 'Máximo 20 medicamentos por receta'),
+  diagnosis: optionalText(500),
+  generalInstructions: optionalText(4000),
+  weightKg: z.number().finite().positive().max(400).nullable().optional(),
+};
+
+export const prescriptionCreateInput = z.object({
+  ...prescriptionFields,
+  date: isoDate.optional(),
+  items: prescriptionFields.items.optional(),
+  /** Prellenar con estos medicamentos de la lista del paciente. */
+  fromMedicationIds: z.array(z.uuid()).max(20).optional(),
+});
+export type PrescriptionCreateInput = z.input<typeof prescriptionCreateInput>;
+
+export const prescriptionUpdateInput = z.object(prescriptionFields).partial();
+export type PrescriptionUpdateInput = z.input<typeof prescriptionUpdateInput>;
+
+export const prescriptionIssueInput = z.object({
+  /** Agregar a la lista de medicamentos del paciente los que aún no estén activos. */
+  addToMedications: z.boolean().default(false),
+});
+
+export const prescriptionCancelInput = z.object({
+  reason: trimmed(500).min(5, 'Escriba el motivo de la cancelación'),
+});
+
 export const aiHistoryDraftInput = z.object({
   noteIds: z.array(z.uuid()).min(1, 'Seleccione al menos una nota').max(30),
 });

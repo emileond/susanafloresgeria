@@ -7,6 +7,8 @@ import type {
   NoteInput,
   PatientCreateInput,
   PatientUpdateInput,
+  PrescriptionCreateInput,
+  PrescriptionUpdateInput,
 } from '../../shared/schemas';
 import type {
   AiHistoryDraft,
@@ -19,6 +21,7 @@ import type {
   NoteItem,
   PatientDetail,
   PatientListItem,
+  Prescription,
 } from '../../shared/types';
 import { api } from './api';
 
@@ -34,6 +37,8 @@ export const qk = {
   files: (patientId: string) => ['patient', patientId, 'files'] as const,
   medications: (patientId: string) => ['patient', patientId, 'medications'] as const,
   assessments: (patientId: string) => ['patient', patientId, 'assessments'] as const,
+  prescriptions: (patientId: string) => ['patient', patientId, 'prescriptions'] as const,
+  prescription: (id: string) => ['prescription', id] as const,
 };
 
 export const useMe = () => useQuery({ queryKey: qk.me, queryFn: () => api<Me>('/me'), staleTime: 5 * 60_000 });
@@ -212,3 +217,45 @@ export const useAiHistoryDraft = (patientId: string) =>
   useMutation({
     mutationFn: (noteIds: string[]) => api<AiHistoryDraft>(`/patients/${patientId}/history/ai-draft`, { method: 'POST', json: { noteIds } }),
   });
+
+// Recetas
+export const usePrescriptions = (patientId: string) =>
+  useQuery({ queryKey: qk.prescriptions(patientId), enabled: !!patientId, queryFn: () => api<Prescription[]>(`/patients/${patientId}/prescriptions`) });
+export const usePrescription = (id: string) => useQuery({ queryKey: qk.prescription(id), queryFn: () => api<Prescription>(`/prescriptions/${id}`) });
+
+export function usePrescriptionMutations(patientId: string) {
+  const qc = useQueryClient();
+  const refresh = (rx?: Prescription) => {
+    if (rx) qc.setQueryData(qk.prescription(rx.id), rx);
+    void qc.invalidateQueries({ queryKey: qk.prescriptions(patientId) });
+    void qc.invalidateQueries({ queryKey: qk.patient(patientId) });
+  };
+  return {
+    create: useMutation({
+      mutationFn: (input: PrescriptionCreateInput) => api<Prescription>(`/patients/${patientId}/prescriptions`, { method: 'POST', json: input }),
+      onSuccess: refresh,
+    }),
+    update: useMutation({
+      mutationFn: ({ id, ...input }: PrescriptionUpdateInput & { id: string }) => api<Prescription>(`/prescriptions/${id}`, { method: 'PATCH', json: input }),
+      onSuccess: (rx) => qc.setQueryData(qk.prescription(rx.id), rx),
+    }),
+    issue: useMutation({
+      mutationFn: ({ id, addToMedications }: { id: string; addToMedications: boolean }) =>
+        api<Prescription>(`/prescriptions/${id}/issue`, { method: 'POST', json: { addToMedications } }),
+      onSuccess: (rx) => {
+        refresh(rx);
+        void qc.invalidateQueries({ queryKey: qk.medications(patientId) });
+        void qc.invalidateQueries({ queryKey: qk.patient(patientId) });
+      },
+    }),
+    cancel: useMutation({
+      mutationFn: ({ id, reason }: { id: string; reason: string }) => api<Prescription>(`/prescriptions/${id}/cancel`, { method: 'POST', json: { reason } }),
+      onSuccess: refresh,
+    }),
+    copy: useMutation({ mutationFn: (id: string) => api<Prescription>(`/prescriptions/${id}/copy`, { method: 'POST' }), onSuccess: refresh }),
+    discard: useMutation({ mutationFn: (id: string) => api(`/prescriptions/${id}`, { method: 'DELETE' }), onSuccess: () => refresh() }),
+  };
+}
+
+/** Registra en la bitácora que se imprimió o exportó la receta (no bloquea la impresión). */
+export const logPrescriptionPrinted = (id: string) => api(`/prescriptions/${id}/printed`, { method: 'POST' }).catch(() => undefined);

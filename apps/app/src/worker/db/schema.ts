@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
-import { index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import type { PrescriptionItem, PrescriptionSnapshot } from '../../shared/types';
+import { index, integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 /**
  * Esquema D1 del expediente clínico.
@@ -189,6 +190,40 @@ export const assessments = sqliteTable(
   (t) => [index('assessments_patient_idx').on(t.patientId, t.scaleKey, t.performedAt)],
 );
 
+/**
+ * Recetas. Un borrador se edita libremente; al emitirse queda inmutable (API y trigger).
+ * Para corregir una receta emitida se cancela con motivo y se emite una nueva; nada se borra.
+ */
+export const prescriptions = sqliteTable(
+  'prescriptions',
+  {
+    id: id(),
+    patientId: text('patient_id')
+      .notNull()
+      .references(() => patients.id),
+    noteId: text('note_id').references(() => notes.id),
+    /** Número consecutivo asignado al emitir. */
+    folio: integer('folio'),
+    date: text('date').notNull(),
+    items: text('items', { mode: 'json' }).notNull().$type<PrescriptionItem[]>(),
+    diagnosis: text('diagnosis'),
+    generalInstructions: text('general_instructions'),
+    weightKg: real('weight_kg'),
+    status: text('status', { enum: ['draft', 'issued', 'cancelled'] }).notNull().default('draft'),
+    snapshot: text('snapshot', { mode: 'json' }).$type<PrescriptionSnapshot>(),
+    issuedAt: integer('issued_at', { mode: 'timestamp_ms' }),
+    issuedBy: text('issued_by').references(() => users.id),
+    cancelledAt: integer('cancelled_at', { mode: 'timestamp_ms' }),
+    cancelledBy: text('cancelled_by').references(() => users.id),
+    cancelReason: text('cancel_reason'),
+    /** Receta de la que se copió (p. ej. la cancelada a la que corrige). */
+    sourceId: text('source_id'),
+    ...timestamps,
+    ...authorship,
+  },
+  (t) => [index('prescriptions_patient_idx').on(t.patientId, t.date), uniqueIndex('prescriptions_folio_unique').on(t.folio)],
+);
+
 /** Bitácora de accesos y cambios (NOM-024): quién, qué, cuándo. Nunca guarda contenido clínico. */
 export const auditLog = sqliteTable(
   'audit_log',
@@ -216,3 +251,4 @@ export type Note = typeof notes.$inferSelect;
 export type FileRecord = typeof files.$inferSelect;
 export type Medication = typeof medications.$inferSelect;
 export type Assessment = typeof assessments.$inferSelect;
+export type Prescription = typeof prescriptions.$inferSelect;
