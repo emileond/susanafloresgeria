@@ -61,7 +61,7 @@ export const site = {
     languages: ['Español', 'Inglés'],
   },
 
-  // Precios de referencia (tomados del perfil de Doctoralia). Actualice si cambian.
+  // Precios de referencia (perfil de Doctoralia). Actualmente NO se muestran en el sitio.
   pricing: {
     clinic: 800,
     home: 1250,

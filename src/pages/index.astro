@@ -41,7 +41,6 @@ import HeartHandshake from '@lucide/astro/icons/heart-handshake';
 
 const posts = (await getSortedPosts()).slice(0, 3);
 
-const mxn = (n: number) => `$${n.toLocaleString('es-MX')}`;
 
 
 // Qué aporta un geriatra, en lenguaje sencillo
@@ -139,19 +138,16 @@ const modalities = [
     icon: Stethoscope,
     title: 'En consultorio',
     desc: `${site.address.neighborhood}, León. Primera consulta con valoración completa.`,
-    price: mxn(site.pricing.clinic),
   },
   {
     icon: House,
     title: 'A domicilio',
     desc: 'Si a su familiar le cuesta trasladarse o está en cama. Incluye cuidados paliativos en casa.',
-    price: mxn(site.pricing.home),
   },
   {
     icon: Video,
     title: 'En línea',
     desc: 'Para seguimiento, o si usted vive en otra ciudad o en el extranjero. Con receta electrónica.',
-    price: `$${site.pricing.online}`,
   },
 ];
 
@@ -216,15 +212,15 @@ const faqs = [
   },
   {
     q: '¿Atiende a domicilio?',
-    a: `Sí. Realizo visitas a domicilio en León para personas mayores a las que se les dificulta trasladarse, incluidos cuidados paliativos en casa. El costo de referencia es de ${mxn(site.pricing.home)}. Consulte disponibilidad para su zona.`,
+    a: `Sí. Realizo visitas a domicilio en León para personas mayores a las que se les dificulta trasladarse, incluidos cuidados paliativos en casa. Consulte disponibilidad para su zona.`,
   },
   {
     q: 'Vivo en otra ciudad, ¿puedo tener una consulta en línea?',
     a: 'Sí. La consulta en línea funciona muy bien para seguimiento y para familias que viven lejos, e incluye receta electrónica. Para una primera valoración completa puede recomendarse una visita presencial.',
   },
   {
-    q: '¿Cuánto cuesta la consulta?',
-    a: `Consulta de primera vez en consultorio: ${mxn(site.pricing.clinic)}. A domicilio: ${mxn(site.pricing.home)}. En línea: $${site.pricing.online}. Formas de pago: ${site.payments.toLowerCase()}`,
+    q: '¿Cuáles son las formas de pago?',
+    a: `${site.payments} El costo depende del tipo de consulta y se lo confirmo al momento de agendar.`,
   },
   {
     q: '¿Acepta seguros de gastos médicos?',
@@ -509,10 +505,9 @@ const quickTopics = ['Memoria', 'Caídas', 'Medicamentos', 'Enfermedades crónic
     <div class="container-page">
       <div class="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
         <div class="max-w-2xl">
-          <p class="eyebrow">Modalidades y costos</p>
+          <p class="eyebrow">Modalidades</p>
           <h2 class="section-title mt-4">Elija la consulta que mejor le acomode</h2>
         </div>
-        <p class="text-base text-muted">Costos de referencia; se confirman al agendar.</p>
       </div>
 
       <div class="mt-10 grid gap-4 md:grid-cols-3">
@@ -523,12 +518,7 @@ const quickTopics = ['Memoria', 'Caídas', 'Medicamentos', 'Enfermedades crónic
                 <m.icon aria-hidden="true" />
               </span>
               <h3 class="mt-6 text-2xl">{m.title}</h3>
-              <p class="mt-2 flex-1 text-base text-ink/75">{m.desc}</p>
-              <p class="mt-6 rounded-2xl bg-white/70 px-5 py-4">
-                <span class="block text-3xl font-bold">
-                  {m.price} <span class="text-base font-semibold text-muted">MXN</span>
-                </span>
-              </p>
+              <p class="mt-2 text-base text-ink/75">{m.desc}</p>
             </div>
           ))
         }
