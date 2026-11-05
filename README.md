@@ -1,57 +1,41 @@
-# Sitio web — Dra. Susana Flores Alonso, Geriatra en León
+# Dra. Susana Flores Alonso — Geriatra en León
 
-Sitio estático construido con [Astro](https://astro.build) + Tailwind CSS. Genera HTML puro (sin depender de JavaScript para mostrar el contenido), lo que lo hace rápido en celulares y fácil de indexar por Google.
-
-## Comandos
-
-| Comando           | Acción                                          |
-| ----------------- | ----------------------------------------------- |
-| `npm install`     | Instala dependencias                            |
-| `npm run dev`     | Servidor de desarrollo en `http://localhost:4321` |
-| `npm run build`   | Genera el sitio final en `dist/`                |
-| `npm run preview` | Sirve localmente la carpeta `dist/`             |
-| `npm run check`   | Revisa errores de tipos y plantillas            |
-
-`dist/` se puede publicar en cualquier hosting estático (Cloudflare Pages, Netlify, Vercel, GitHub Pages…).
-
-## Dónde cambiar las cosas
-
-- **Correo, dirección, horarios, perfil de Doctoralia y cédulas:** `src/config/site.ts`. Todo el sitio toma los datos de ahí.
-- **Textos de la página principal** (servicios, pasos, testimonios, preguntas frecuentes): `src/pages/index.astro`. Cada sección está separada con un comentario.
-- **Colores y tipografías:** `src/styles/global.css`.
-- **Foto:** `src/assets/headshot.png`. Astro la optimiza automáticamente (WebP, varios tamaños).
-- **Imagen para compartir en WhatsApp/Facebook:** `public/og-image.jpg` (1200×630).
-
-## Blog en Markdown
-
-Los artículos se escriben en archivos Markdown con frontmatter en `src/content/blog/`:
+Monorepo con npm workspaces:
 
 ```
----
-slug: mi-primer-post
-title: "Título del artículo (50–65 caracteres)"
-description: "Descripción para Google, 140–160 caracteres."
-excerpt: "Resumen corto para la tarjeta del blog."
-date: 2026-01-03
-updated: 2026-02-10            # opcional: fecha de la última revisión
-category: "Memoria"            # Geriatría | Memoria | Caídas y movilidad | Medicamentos | Cuidadores | Salud general | Cuidados paliativos
-summary:                       # opcional: recuadro "En resumen"
-  - "Punto clave 1"
-  - "Punto clave 2"
-faqs:                          # opcional: preguntas al final (también se envían a Google)
-  - q: "¿Pregunta?"
-    a: "Respuesta breve."
-cta:                           # opcional: texto del bloque para agendar
-  title: "Título del llamado a la acción"
-  text: "Texto breve."
----
-
-Contenido en Markdown...
+apps/
+  web/          Sitio público (Astro + Tailwind): inicio, servicios y blog → susanafloresgeria.com
+  app/          (próximamente) App de expedientes para la doctora: Vite + React + Cloudflare Workers, D1 y R2
+packages/
+  theme/        Colores, tipografía y logo compartidos (tokens de Tailwind)
 ```
 
-- Listado: `/blog/` · Detalle: `/blog/{slug}/`
-- Use un `slug` en minúsculas, con guiones y sin acentos.
-- Use `##` para las secciones principales: aparecen automáticamente en el índice "En este artículo".
-- Para un recuadro destacado, escriba una cita que empiece en negritas: `> **Consejo:** texto…`
-- Cada artículo muestra automáticamente: autora, preguntas frecuentes, bloque para agendar cita y artículos relacionados.
-- El contenido soporta listas, encabezados, tablas y enlaces (GFM).
+## Comandos (desde la raíz)
+
+| Comando             | Acción                                             |
+| ------------------- | -------------------------------------------------- |
+| `npm install`       | Instala las dependencias de todos los paquetes     |
+| `npm run dev`       | Sitio web en `http://localhost:4321`               |
+| `npm run build`     | Compila todos los proyectos                        |
+| `npm run build:web` | Compila solo el sitio web (`apps/web/dist/`)       |
+| `npm run check`     | Revisa errores de tipos en todos los proyectos     |
+
+Para un comando de un solo proyecto: `npm run <script> -w @susanafloresgeria/web`.
+
+## Tema compartido
+
+`packages/theme/theme.css` define los colores (`brand`, `mist`, `ink`, `accent`…) y la tipografía (Figtree).
+Cualquier proyecto con Tailwind v4 lo usa así:
+
+```css
+@import "tailwindcss";
+@import "@susanafloresgeria/theme";
+```
+
+Agregue `"@susanafloresgeria/theme": "*"` a las dependencias del proyecto. Un cambio de color en ese archivo se refleja en el sitio y en la app.
+
+## Despliegue
+
+Cada app se despliega por separado en Cloudflare desde este mismo repositorio, indicando su carpeta (`apps/web`, `apps/app`) como raíz del proyecto. Así, un cambio en el blog no vuelve a desplegar la app de expedientes y viceversa.
+
+Detalles de cada proyecto en su propio README: [apps/web](apps/web/README.md).
